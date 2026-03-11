@@ -23,6 +23,17 @@
 
 ---
 
+## Public Entry Points
+
+| Entry point                    | Назначение |
+|--------------------------------|------------|
+| `sprite-animations`            | Стабильный корневой API для большинства потребителей |
+| `sprite-animations/core`       | Core-модели и фабрики runtime без renderer-specific логики |
+| `sprite-animations/renderers`  | Renderer-фабрики, начиная с `canvas` |
+| `sprite-animations/types`      | Публичные типы конфигурации и runtime-контрактов |
+
+---
+
 ## Потоки данных
 
 ```
@@ -52,3 +63,20 @@
 | Слишком плотная связка playground и runtime | Medium | Medium | Отделить playground как отдельный consumer core API |
 | Непрозрачный timing engine  | Medium      | High    | Сделать timing policy явной и покрыть тестами |
 | Будущая миграция к WebGL усложнится | Low | Medium | Не связывать core вычислений с Canvas 2D renderer |
+
+---
+
+## Package Structure
+
+```text
+src/
+  core/
+    animation-player.ts
+    sprite-sheet.ts
+    index.ts
+  renderers/
+    create-canvas-sprite-renderer.ts
+    index.ts
+  types.ts
+  index.ts
+```

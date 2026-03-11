@@ -77,3 +77,4 @@
 - В MVP используется regular grid sprite sheet вместо atlas.
 - При наличии и `fps`, и `duration` приоритет у `duration`.
 - Playground является частью dev workflow, но не частью production runtime библиотеки.
+- Корневой пакет экспортирует стабильный public API, а subpath exports разделены на `./core`, `./renderers` и `./types`.

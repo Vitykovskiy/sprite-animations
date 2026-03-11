@@ -1,108 +1,77 @@
-# AI-dev-template
+# sprite-animations
 
-Переиспользуемый шаблон репозитория для разработки новых проектов с консистентным AI-driven workflow.
+`sprite-animations` is a framework-agnostic TypeScript library for 2D sprite animation on HTML canvas.
 
----
+The current MVP focus is deliberately narrow:
+- regular grid sprite sheets;
+- runtime playback on `CanvasRenderingContext2D`;
+- timing via `fps` and/or `duration`;
+- predictable positioning and scaling;
+- a separate playground for asset validation and config tuning.
 
-## Назначение шаблона
+## Current package structure
 
-Шаблон обеспечивает предсказуемый, повторяемый процесс разработки, в котором AI-агент выступает системным аналитиком, project manager'ом, tech lead'ом и исполнителем. Любая новая сессия агента должна продолжать работу ровно с того места, где остановилась предыдущая.
-
----
-
-## Что автоматизирует агент
-
-- Проверяет git / git remote / gh CLI / токен / базовые настройки.
-- Сообщает, чего не хватает для продолжения работы.
-- Качественно снимает бизнес-задачу: уточняет цель, ограничения, риски, варианты.
-- Создает и обновляет документацию проекта в `docs/`.
-- Определяет стек и фиксирует best practices.
-- Создает GitHub labels.
-- Создает Epic и подзадачи в GitHub Issues.
-- Ведет GitHub Project: двигает карточки, актуализирует статусы.
-- По согласию пользователя запускает `docker-compose.vector-db.yml`.
-
----
-
-## Что человек делает вручную
-
-### Обязательные ручные шаги
-
-1. Создать новый репозиторий из этого шаблона на GitHub.
-2. Клонировать репозиторий локально.
-3. Передать агенту доступ к репозиторию (убедиться, что агент имеет нужные права).
-4. Создать GitHub Project вручную (тип: Board / Kanban).
-5. Передать агенту ссылку на GitHub Project.
-6. Передать бизнес-задачу на естественном языке.
-7. Если агент предложил использовать Vector DB и вы согласились — заполнить секреты в `.env` по инструкции агента.
-
----
-
-## Пошаговая инициализация нового проекта
-
-```bash
-# Шаг 1. Клонируйте репозиторий
-git clone https://github.com/<org>/<repo>.git
-cd <repo>
-
-# Шаг 2. Проверьте окружение
-bash scripts/bootstrap.sh
-
-# Шаг 3. Передайте агенту ссылку на GitHub Project и бизнес-задачу
-# Агент сам проверит окружение, снимет задачу и начнет работу
+```text
+src/
+  core/
+    animation-player.ts
+    sprite-sheet.ts
+    index.ts
+  renderers/
+    create-canvas-sprite-renderer.ts
+    index.ts
+  types.ts
+  index.ts
 ```
 
----
+## Public entry points
 
-## GitHub Project
+- `sprite-animations`
+- `sprite-animations/core`
+- `sprite-animations/renderers`
+- `sprite-animations/types`
 
-### Формат
+## Public API draft
 
-GitHub Project использует простой Kanban-процесс.
+```ts
+import {
+  createAnimationPlayer,
+  createCanvasSpriteRenderer,
+  createSpriteSheet,
+} from "sprite-animations";
 
-**Статусы:**
+const spriteSheet = createSpriteSheet({
+  image,
+  grid: {
+    frameWidth: 64,
+    frameHeight: 64,
+    columns: 8,
+    rows: 4,
+    totalFrames: 24,
+  },
+});
 
-| Статус      | Описание                         |
-|-------------|----------------------------------|
-| `Backlog`   | Задача зафиксирована, не взята   |
-| `In progress` | Задача взята в работу          |
-| `Closed`    | Задача завершена                 |
+const player = createAnimationPlayer({
+  totalFrames: spriteSheet.getFrameCount(),
+  fps: 12,
+  duration: 1500,
+  loop: true,
+});
 
-**Обязательные поля:**
-- `Status`
-- `Priority`
-- `Area`
+const renderer = createCanvasSpriteRenderer();
+```
 
-### Кто управляет задачами
+## API responsibilities
 
-- **Labels создает агент** — не нужно создавать вручную.
-- **Issues создает агент** — не нужно создавать вручную.
-- **Карточки двигает агент** — не нужно двигать вручную.
-- Человек не обязан вручную создавать задачи.
+- `createSpriteSheet(...)`
+  Defines the sprite grid contract and frame lookup API.
 
-**URL GitHub Project** вписывается в `docs/09-integrations.md`.
+- `createAnimationPlayer(...)`
+  Owns playback state and timing policy.
 
----
+- `createCanvasSpriteRenderer(...)`
+  Draws a resolved frame to a canvas context without owning playback state.
 
-## Опциональное подключение Vector DB
+## Status
 
-Vector DB подключается только по согласию пользователя.
-
-Процесс:
-1. Агент предложит Vector DB, если это оправдано задачей.
-2. Вы соглашаетесь или отказываетесь.
-3. Если согласились — агент уточнит провайдера эмбеддингов.
-4. Агент сообщит, какие переменные нужно заполнить в `.env`.
-5. Агент запустит `docker-compose.vector-db.yml`.
-
-Compose-файл уже лежит в шаблоне. Агент его не пересоздает.
-
----
-
-## Ограничения и допущения
-
-- GitHub Copilot не поддерживается и не используется.
-- Агент не хранит значимое состояние только во временном контексте.
-- Источник правды по задачам — GitHub Issues + GitHub Project.
-- Источник правды по архитектуре и решениям — `docs/`.
-- Локальные черновики в `tasks/` — временные, не канонические.
+This repository is in active MVP setup. The package structure and public API are defined first; asset loading, runtime behavior hardening, playground UX, and publish-ready infrastructure are tracked as separate backlog tasks.
