@@ -38,10 +38,13 @@ import {
   createAnimationPlayer,
   createCanvasSpriteRenderer,
   createSpriteSheet,
+  loadSpriteSheetImage,
 } from "sprite-animations";
 
+const loadedImage = await loadSpriteSheetImage("/assets/hero.png");
+
 const spriteSheet = createSpriteSheet({
-  image,
+  image: loadedImage.image,
   grid: {
     frameWidth: 64,
     frameHeight: 64,
@@ -63,6 +66,9 @@ const renderer = createCanvasSpriteRenderer();
 
 ## API responsibilities
 
+- `loadSpriteSheetImage(...)`
+  Loads a sprite sheet from a URL, `HTMLImageElement`, or `ImageBitmap`.
+
 - `createSpriteSheet(...)`
   Defines the sprite grid contract and frame lookup API.
 
@@ -75,3 +81,12 @@ const renderer = createCanvasSpriteRenderer();
 ## Status
 
 This repository is in active MVP setup. The package structure and public API are defined first; asset loading, runtime behavior hardening, playground UX, and publish-ready infrastructure are tracked as separate backlog tasks.
+
+## Validation
+
+Current scaffold validation commands:
+
+```bash
+tsc --noEmit -p tsconfig.json
+npm test
+```

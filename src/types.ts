@@ -6,6 +6,18 @@ export interface SpriteSheetGrid {
   totalFrames?: number;
 }
 
+export type SpriteSheetImageSource = string | HTMLImageElement | ImageBitmap;
+
+export interface LoadSpriteSheetImageOptions {
+  crossOrigin?: string;
+}
+
+export interface LoadedSpriteSheetImage {
+  image: HTMLImageElement | ImageBitmap;
+  width: number;
+  height: number;
+}
+
 export interface SpriteSheetConfig {
   image: CanvasImageSource;
   grid: SpriteSheetGrid;
