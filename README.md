@@ -78,6 +78,18 @@ const renderer = createCanvasSpriteRenderer();
 - `createCanvasSpriteRenderer(...)`
   Draws a resolved frame to a canvas context without owning playback state.
 
+## Timing policy
+
+- If only `fps` is set, playback advances frame-by-frame using frame duration.
+- If only `duration` is set, frames are resolved from elapsed progress across the full animation.
+- If both `fps` and `duration` are set, `duration` has priority and `fps` acts as an update-frequency cap, which means frame skipping is allowed.
+
+## Canvas rendering contract
+
+- The renderer only draws a requested frame.
+- Positioning is controlled through `{ x, y }` draw options.
+- Scaling is applied at draw time and does not mutate sprite sheet metadata.
+
 ## Status
 
 This repository is in active MVP setup. The package structure and public API are defined first; asset loading, runtime behavior hardening, playground UX, and publish-ready infrastructure are tracked as separate backlog tasks.
