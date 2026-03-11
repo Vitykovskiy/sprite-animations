@@ -101,4 +101,14 @@ Current scaffold validation commands:
 ```bash
 tsc --noEmit -p tsconfig.json
 npm test
+npm run playground:build
+```
+
+## Playground
+
+Run the dev playground locally:
+
+```bash
+npm install
+npm run playground:dev
 ```

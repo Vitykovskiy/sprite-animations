@@ -1,0 +1,252 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f1e8;
+  --panel: rgba(255, 252, 247, 0.92);
+  --panel-strong: rgba(255, 248, 238, 0.98);
+  --line: rgba(71, 56, 38, 0.12);
+  --text: #231b12;
+  --muted: #6f6154;
+  --accent: #0f766e;
+  --accent-soft: rgba(15, 118, 110, 0.14);
+  --shadow: 0 18px 60px rgba(63, 47, 31, 0.12);
+  --radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 35%),
+    linear-gradient(135deg, #efe6d8 0%, #f8f5ee 40%, #e3efe9 100%);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+.playground-shell {
+  display: grid;
+  grid-template-columns: minmax(340px, 420px) 1fr;
+  gap: 24px;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.control-panel,
+.preview-panel {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+.control-panel {
+  padding: 24px;
+  overflow: auto;
+}
+
+.preview-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.panel-header h1,
+.preview-header h2,
+.panel-section h2 {
+  margin: 0;
+}
+
+.subtitle,
+#preview-message,
+#asset-meta {
+  color: var(--muted);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.panel-section {
+  margin-top: 24px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel-strong);
+}
+
+.grid-two {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-two h2 {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.field-full {
+  grid-column: 1 / -1;
+}
+
+.field-checkbox {
+  flex-direction: row;
+  align-items: center;
+}
+
+.field-checkbox span {
+  color: var(--text);
+}
+
+input,
+textarea,
+button {
+  border-radius: 14px;
+  border: 1px solid rgba(35, 27, 18, 0.14);
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--text);
+}
+
+input,
+textarea {
+  padding: 10px 12px;
+}
+
+button {
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 120ms ease, background-color 120ms ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-card,
+.status-grid {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.status-card {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+}
+
+.status-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.status-grid > div {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(35, 27, 18, 0.04);
+}
+
+.metric-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+#config-output {
+  width: 100%;
+  margin-top: 12px;
+  resize: vertical;
+  font-family: "IBM Plex Mono", "Cascadia Code", monospace;
+  font-size: 13px;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+}
+
+.canvas-stage {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  min-height: 320px;
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.07), transparent 35%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(242, 235, 224, 0.9));
+}
+
+#preview-canvas {
+  max-width: 100%;
+  height: auto;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(45, 33, 20, 0.16);
+  background: #fcfaf5;
+}
+
+@media (max-width: 1024px) {
+  .playground-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .playground-shell {
+    padding: 14px;
+  }
+
+  .control-panel,
+  .preview-panel {
+    padding: 16px;
+  }
+
+  .grid-two {
+    grid-template-columns: 1fr;
+  }
+}

@@ -32,7 +32,9 @@
     "typecheck": "tsc --noEmit",
     "build": "tsc -p tsconfig.json",
     "build:types": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test tests/**/*.test.mjs"
+    "test": "npm run build && node --test tests/**/*.test.mjs",
+    "playground:dev": "vite",
+    "playground:build": "vite build"
   },
   "keywords": [
     "sprite",
@@ -45,6 +47,7 @@
     "node": ">=22.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vite": "^7.1.5"
   }
 }
