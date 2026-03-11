@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "description": "Framework-agnostic sprite animation library for HTML canvas.",
   "type": "module",
-  "private": true,
+  "private": false,
+  "packageManager": "npm@11.6.1",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -29,12 +31,16 @@
     }
   },
   "scripts": {
-    "typecheck": "tsc --noEmit",
-    "build": "tsc -p tsconfig.json",
-    "build:types": "tsc -p tsconfig.json",
+    "clean": "node -e \"import('node:fs/promises').then(fs => fs.rm('dist', { recursive: true, force: true }))\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "build:types": "tsc -p tsconfig.build.json",
     "test": "npm run build && node --test tests/**/*.test.mjs",
     "playground:dev": "vite",
-    "playground:build": "vite build"
+    "playground:build": "vite build --outDir playground-dist",
+    "check": "npm run typecheck && npm test && npm run playground:build",
+    "pack:check": "npm pack --dry-run",
+    "prepack": "npm run build"
   },
   "keywords": [
     "sprite",
@@ -43,6 +49,14 @@
     "typescript"
   ],
   "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vitykovskiy/sprite-animations.git"
+  },
+  "homepage": "https://github.com/Vitykovskiy/sprite-animations",
+  "bugs": {
+    "url": "https://github.com/Vitykovskiy/sprite-animations/issues"
+  },
   "engines": {
     "node": ">=22.0.0"
   },

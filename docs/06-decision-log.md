@@ -173,3 +173,23 @@ Playground реализован как root-level `index.html` + TypeScript-мо
 
 **Последствия:**
 В репозитории появляется root `index.html` как dev entry point. Playground остается частью внутреннего workflow и не меняет production API пакета.
+
+### ADR-008: Раздельные output directories для library build и playground build
+
+**Дата:** 2026-03-11
+**Статус:** Accepted
+
+**Контекст:**
+После добавления playground выяснилось, что library build и Vite build не должны писать в один и тот же `dist/`, иначе quality gate и `npm pack --dry-run` начинают конфликтовать друг с другом.
+
+**Решение:**
+Library build продолжает собираться в `dist/`, а playground build выводится в `playground-dist/`.
+
+**Причина:**
+Так package artifacts остаются чистыми и пригодными для публикации, а playground сохраняет собственный build output без риска повредить library bundle.
+
+**Альтернативы:**
+Один общий `dist/`; отдельный репозиторий или подпакет для playground.
+
+**Последствия:**
+`npm pack --dry-run` отражает только библиотеку, а dev playground можно собирать и проверять независимо.

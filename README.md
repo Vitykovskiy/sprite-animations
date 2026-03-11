@@ -102,6 +102,7 @@ Current scaffold validation commands:
 tsc --noEmit -p tsconfig.json
 npm test
 npm run playground:build
+npm pack --dry-run
 ```
 
 ## Playground
@@ -112,3 +113,20 @@ Run the dev playground locally:
 npm install
 npm run playground:dev
 ```
+
+## Package workflow
+
+- `npm run build`
+  Builds library artifacts into `dist/` without bundling the playground.
+
+- `npm test`
+  Rebuilds the library and runs runtime regression tests.
+
+- `npm run check`
+  Runs typecheck, tests, and playground build as a single quality gate.
+
+- `npm run pack:check`
+  Verifies the package contents with `npm pack --dry-run`.
+
+- `npm run playground:build`
+  Emits the dev playground into `playground-dist/` so it does not overwrite library artifacts in `dist/`.
