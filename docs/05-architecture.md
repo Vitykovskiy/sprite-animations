@@ -7,7 +7,7 @@
 ## Контекст системы
 
 <!-- Что это за система, с чем взаимодействует, кто использует -->
-_TBD_
+Система состоит из framework-agnostic core библиотеки для sprite-анимации и отдельного playground-приложения. Core используется разработчиком внутри веб-приложения на `canvas`, а playground помогает разработчику и дизайнеру настраивать сетку кадров, тайминг и позиционирование.
 
 ---
 
@@ -15,17 +15,24 @@ _TBD_
 
 | Компонент       | Зона ответственности         | Технология   |
 |-----------------|------------------------------|--------------|
-| _TBD_           | _TBD_                        | _TBD_        |
+| Asset Loader    | Загрузка изображения sprite sheet | Browser image loading / TypeScript |
+| Sprite Model    | Описание сетки кадров и конфигурации анимации | TypeScript |
+| Animation Player| Вычисление текущего кадра, тайминга, loop и frame skipping | TypeScript |
+| Canvas Renderer | Отрисовка текущего кадра на `canvas`, масштаб и позиция | Canvas 2D API |
+| Playground      | Настройка параметров, предпросмотр и сохранение конфига | Vite + TypeScript |
 
 ---
 
 ## Потоки данных
 
 ```
-[Component A] --> [Component B] --> [Component C]
+[Sprite Sheet Image] --> [Asset Loader] --> [Sprite Model]
+[Sprite Model] --> [Animation Player] --> [Canvas Renderer]
+[Sprite Model] --> [Playground UI]
+[Animation Player] --> [Playground Preview]
 ```
 
-_TBD — описать ключевые потоки данных_
+Разработчик или playground передает в core изображение и конфиг сетки кадров. `Animation Player` вычисляет текущий кадр на основе времени, `fps`, `duration` и режима loop. `Canvas Renderer` получает вычисленный кадр и рисует его в заданной позиции и масштабе.
 
 ---
 
@@ -33,7 +40,8 @@ _TBD — описать ключевые потоки данных_
 
 | Внешняя система  | Тип интеграции   | Направление   | Описание      |
 |------------------|------------------|---------------|---------------|
-| _TBD_            | REST API         | Outbound      | _TBD_         |
+| npm registry     | Package distribution | Outbound   | Публикация библиотеки как npm-пакета |
+| GitHub           | Project management | Bidirectional | Ведение issues, project board и документации |
 
 ---
 
@@ -41,4 +49,6 @@ _TBD — описать ключевые потоки данных_
 
 | Риск                        | Вероятность | Влияние | Митигация             |
 |-----------------------------|-------------|---------|------------------------|
-| _TBD_                       | Medium      | High    | _TBD_                 |
+| Слишком плотная связка playground и runtime | Medium | Medium | Отделить playground как отдельный consumer core API |
+| Непрозрачный timing engine  | Medium      | High    | Сделать timing policy явной и покрыть тестами |
+| Будущая миграция к WebGL усложнится | Low | Medium | Не связывать core вычислений с Canvas 2D renderer |

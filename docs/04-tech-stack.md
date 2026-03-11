@@ -8,7 +8,12 @@
 
 | Категория       | Технология      | Версия  | Причина выбора          |
 |-----------------|-----------------|---------|-------------------------|
-| _TBD_           | _TBD_           | _TBD_   | _TBD_                   |
+| Язык            | TypeScript      | 5.x     | Типизированный API библиотеки и конфигов, меньше ошибок в runtime |
+| Runtime         | JavaScript (browser) | ES2022+ | Целевая среда потребления библиотеки |
+| Renderer API    | Canvas 2D API   | browser standard | Прямое соответствие целевому use case |
+| Build / Dev     | Vite            | 6.x/7.x | Подходит и для npm-библиотеки, и для playground |
+| Tests           | Vitest          | 3.x     | Нативная интеграция с Vite и быстрые unit-тесты |
+| Package manager | npm             | 10.x+   | Целевой формат публикации и потребления пакета |
 
 ---
 
@@ -16,7 +21,10 @@
 
 | Технология    | Почему не выбрана             |
 |---------------|-------------------------------|
-| _TBD_         | _TBD_                         |
+| JSON atlas    | В MVP избыточен; пользователь подтвердил формат regular grid sprite sheet |
+| Phaser / PixiJS как основа | Слишком широкая зависимость для собственного минимального core |
+| React / Vue adapters | Нет подтвержденной необходимости в первой версии |
+| WebGL renderer | Отложен в дальний backlog |
 
 ---
 
@@ -24,7 +32,9 @@
 
 | Риск                   | Вероятность | Влияние | Митигация             |
 |------------------------|-------------|---------|------------------------|
-| _TBD_                  | Medium      | High    | _TBD_                 |
+| Vite может оказаться недостаточно гибким для будущей публикации нескольких entry points | Medium | Medium | Держать архитектуру пакета модульной и пересмотреть bundler после стабилизации API |
+| Canvas 2D может стать узким местом для сложных сцен | Medium | Medium | Не смешивать core анимации и будущий renderer, оставить путь к WebGL |
+| Сложный API тайминга | Medium | High | Формализовать deterministic timing policy и покрыть тестами |
 
 ---
 
@@ -32,14 +42,38 @@
 
 > Зафиксированные best practices по выбранным технологиям. Агент обязан опираться на них в реализации.
 
-### [Технология 1]
-- Официальная документация: _ссылка_
+### TypeScript
+- Официальная документация: https://www.typescriptlang.org/docs/
 - Best practices:
-  - _TBD_
+  - экспортировать стабильные публичные типы для runtime-конфигов
+  - отделять internal types от public API
+  - включить строгую типизацию для core-модулей
+
+### Canvas 2D API
+- Официальная документация: https://developer.mozilla.org/docs/Web/API/Canvas_API
+- Best practices:
+  - отделять вычисление состояния анимации от фактического вызова `drawImage`
+  - использовать `deltaTime` или вычисление по elapsed time вместо зависимости от фиксированного цикла
+  - не смешивать asset loading, animation state и rendering в одном объекте
+
+### Vite
+- Официальная документация: https://vite.dev/guide/
+- Best practices:
+  - разделять library mode и playground app
+  - минимизировать runtime-specific magic в сборке библиотеки
+  - держать конфигурацию сборки прозрачной для публикации в npm
+
+### Vitest
+- Официальная документация: https://vitest.dev/guide/
+- Best practices:
+  - покрыть unit-тестами вычисление кадров и timing policy
+  - отдельно тестировать frame skipping при одновременном использовании `fps` и `duration`
 
 ---
 
 ## Проектные соглашения
 
 <!-- Специфические соглашения для этого проекта, не покрытые стандартными best practices -->
-- _TBD_
+- В MVP используется regular grid sprite sheet вместо atlas.
+- При наличии и `fps`, и `duration` приоритет у `duration`.
+- Playground является частью dev workflow, но не частью production runtime библиотеки.

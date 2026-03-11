@@ -8,9 +8,9 @@
 
 | Параметр          | Значение                                              |
 |-------------------|-------------------------------------------------------|
-| URL               | **_ВПИСАТЬ СЮДА URL GITHUB PROJECT_**                 |
+| URL               | https://github.com/users/Vitykovskiy/projects/4       |
 | Тип               | Board (Kanban)                                        |
-| Статусы           | Backlog / In progress / Closed                        |
+| Статусы           | Backlog / In Progress / Done                          |
 
 ---
 
@@ -47,8 +47,8 @@
 
 | Интеграция         | Статус        | Примечания                              |
 |--------------------|---------------|-----------------------------------------|
-| GitHub Issues      | _TBD_         | Проверяется через environment check     |
-| GitHub Project     | _TBD_         | URL вписать выше                        |
+| GitHub Issues      | Подключено    | Репозиторий доступен через `gh` CLI     |
+| GitHub Project     | Подключено    | Project `#4`, статусы: Backlog / In Progress / Done |
 | Vector DB (Qdrant) | Не подключена | Подключается по согласию пользователя   |
 
 ---

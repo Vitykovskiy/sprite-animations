@@ -12,6 +12,15 @@ NC='\033[0m'
 ok()   { echo -e "${GREEN}[OK]${NC} $1"; }
 skip() { echo -e "${YELLOW}[SKIP]${NC} $1 (уже существует)"; }
 
+if command -v gh >/dev/null 2>&1; then
+  GH_BIN="gh"
+elif command -v gh.exe >/dev/null 2>&1; then
+  GH_BIN="$(command -v gh.exe)"
+else
+  echo "Ошибка: gh CLI не найден в PATH bash."
+  exit 1
+fi
+
 # Определяем репозиторий
 REPO=$(git remote get-url origin 2>/dev/null | sed 's/.*github.com[:/]//' | sed 's/\.git$//' || echo "")
 
@@ -31,10 +40,10 @@ create_label() {
   local color="$2"
   local description="$3"
 
-  if gh label list --repo "$REPO" --limit 100 | grep -q "^${name}"; then
+  if "$GH_BIN" label list --repo "$REPO" --limit 100 | grep -q "^${name}"; then
     skip "${name}"
   else
-    gh label create "$name" --repo "$REPO" --color "$color" --description "$description" 2>/dev/null && ok "$name" || skip "$name"
+    "$GH_BIN" label create "$name" --repo "$REPO" --color "$color" --description "$description" 2>/dev/null && ok "$name" || skip "$name"
   fi
 }
 
