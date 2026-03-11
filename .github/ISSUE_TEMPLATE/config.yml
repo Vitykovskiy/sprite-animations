@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Документация проекта
+    url: ./docs/00-project-overview.md
+    about: Прочитайте документацию перед созданием issue

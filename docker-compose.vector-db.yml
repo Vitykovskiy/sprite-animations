@@ -1,0 +1,30 @@
+# =============================================================================
+# Vector DB — Optional Component
+# Запускать только после согласия пользователя и заполнения .env
+# Использование: docker compose -f docker-compose.vector-db.yml up -d
+# =============================================================================
+
+version: "3.9"
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: project-qdrant
+    restart: unless-stopped
+    ports:
+      - "${QDRANT_PORT:-6333}:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    environment:
+      - QDRANT__SERVICE__API_KEY=${QDRANT_API_KEY:-}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  qdrant_data:
+    driver: local

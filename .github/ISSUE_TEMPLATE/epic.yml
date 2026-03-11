@@ -1,0 +1,73 @@
+name: Epic
+description: Крупный блок работы, объединяющий связанные задачи
+title: "[Epic] "
+labels: ["type: epic"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Epic
+        Заполните все поля. Epic создается агентом после фазы качественного снятия задачи.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Цель
+      description: Что должно быть достигнуто в рамках этого Epic?
+      placeholder: Конкретная, измеримая цель...
+    validations:
+      required: true
+
+  - type: textarea
+    id: business_value
+    attributes:
+      label: Бизнес-ценность
+      description: Какую ценность создает этот Epic для бизнеса и пользователей?
+      placeholder: Ценность...
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: |
+        **Что входит:**
+
+        **Что НЕ входит:**
+      placeholder: |
+        Что входит:
+        - ...
+
+        Что НЕ входит:
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: done_criteria
+    attributes:
+      label: Критерии завершения
+      description: Когда Epic считается завершенным?
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Зависимости
+      description: Зависимости от других Epic / задач / внешних факторов
+      placeholder: "Depends on: #N"
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Риски
+      description: Технические, бизнесовые, операционные риски
+      placeholder: |
+        | Риск | Влияние | Митигация |
+        |------|---------|-----------|
+        | ... | High | ... |

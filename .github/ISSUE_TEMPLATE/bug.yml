@@ -1,0 +1,54 @@
+name: Bug
+description: Дефект в существующей функциональности
+title: "[Bug] "
+labels: ["type: bug"]
+body:
+  - type: textarea
+    id: observed_behavior
+    attributes:
+      label: Наблюдаемое поведение
+      description: Что происходит на самом деле?
+      placeholder: Происходит X вместо Y...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Ожидаемое поведение
+      description: Что должно происходить?
+      placeholder: Должно происходить Y...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: |
+        1. Открыть...
+        2. Нажать...
+        3. Наблюдать...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Окружение
+      placeholder: |
+        - OS: ...
+        - Версия: ...
+        - Браузер (если применимо): ...
+
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Влияние
+      options:
+        - Critical — система не работает
+        - High — основная функциональность нарушена
+        - Medium — частичная потеря функциональности
+        - Low — косметическая проблема
+    validations:
+      required: true

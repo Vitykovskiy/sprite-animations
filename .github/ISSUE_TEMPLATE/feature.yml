@@ -1,0 +1,45 @@
+name: Feature
+description: Новая функциональность
+title: "[Feature] "
+labels: ["type: feature"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Описание
+      description: Что именно нужно реализовать?
+      placeholder: Описание функциональности...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Ожидаемое поведение
+      description: Как должна работать функциональность?
+      placeholder: При выполнении X происходит Y...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Зависимости
+      placeholder: "Depends on: #N"
+
+  - type: textarea
+    id: technical_notes
+    attributes:
+      label: Технические замечания
+      description: Технические детали, ограничения, предложения по реализации
+      placeholder: Технические замечания...

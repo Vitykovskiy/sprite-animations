@@ -1,0 +1,48 @@
+name: Task
+description: Техническая задача
+title: "[Task] "
+labels: ["type: task"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Что сделать
+      description: Конкретное описание задачи
+      placeholder: Что именно нужно сделать...
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Зачем
+      description: Связь с Epic / бизнес-целью
+      placeholder: Это нужно для того, чтобы...
+    validations:
+      required: true
+
+  - type: textarea
+    id: result
+    attributes:
+      label: Ожидаемый результат
+      description: Что будет существовать по завершении?
+      placeholder: По завершении будет...
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Зависимости
+      placeholder: "Depends on: #N"
+
+  - type: textarea
+    id: done_criteria
+    attributes:
+      label: Критерии завершения
+      placeholder: |
+        - [ ] ...
+        - [ ] Документация обновлена
+        - [ ] Issue закрыт
+    validations:
+      required: true
