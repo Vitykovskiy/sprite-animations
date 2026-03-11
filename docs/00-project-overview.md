@@ -52,6 +52,7 @@
 | `docs/08-vector-db.md`        | Vector DB (опционально)            |
 | `docs/09-integrations.md`     | Интеграции и переменные окружения  |
 | `docs/10-glossary.md`         | Глоссарий                          |
+| `docs/11-ui-ux-contract.json` | JSON-контракт UI/UX элементов для дизайнера |
 
 ---
 

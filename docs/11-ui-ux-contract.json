@@ -1,0 +1,330 @@
+{
+  "document": {
+    "name": "playground-ui-ux-contract",
+    "version": "1.0.0",
+    "last_updated": "2026-03-11",
+    "scope": "sprite-animations dev playground",
+    "source_of_truth": [
+      "index.html",
+      "src/playground/main.ts",
+      "src/playground/styles.css"
+    ],
+    "maintenance_rule": "Update this file whenever new UI elements are added, removed, renamed, or behaviorally changed."
+  },
+  "product_context": {
+    "surface": "dev playground",
+    "audience": [
+      "developer",
+      "designer"
+    ],
+    "primary_jobs": [
+      "load a local sprite sheet",
+      "configure grid and timing",
+      "preview animation on canvas",
+      "save or copy JSON configuration"
+    ]
+  },
+  "layout": {
+    "structure": "two-column shell",
+    "regions": [
+      {
+        "id": "control-panel",
+        "role": "configuration sidebar",
+        "position": "left on desktop, top on mobile",
+        "sections": [
+          "asset",
+          "grid",
+          "timing",
+          "transform",
+          "canvas",
+          "playback",
+          "config"
+        ]
+      },
+      {
+        "id": "preview-panel",
+        "role": "live runtime preview",
+        "position": "right on desktop, bottom on mobile",
+        "sections": [
+          "preview-header",
+          "canvas-stage"
+        ]
+      }
+    ]
+  },
+  "visual_language": {
+    "theme": "warm light editorial canvas lab",
+    "fonts": {
+      "primary": "IBM Plex Sans",
+      "monospace": "IBM Plex Mono"
+    },
+    "tokens": {
+      "background": "#f5f1e8",
+      "text": "#231b12",
+      "muted_text": "#6f6154",
+      "accent": "#0f766e",
+      "panel_surface": "rgba(255, 252, 247, 0.92)",
+      "panel_surface_strong": "rgba(255, 248, 238, 0.98)"
+    },
+    "shape": {
+      "panel_radius_px": 22,
+      "section_radius_px": 18,
+      "input_radius_px": 14
+    }
+  },
+  "sections": [
+    {
+      "id": "asset",
+      "title": "Asset",
+      "purpose": "load and validate a local sprite sheet",
+      "elements": [
+        {
+          "id": "asset-file",
+          "type": "file-input",
+          "label": "Sprite sheet file",
+          "required": false,
+          "accept": "image/*",
+          "behavior": "loads a local image and initializes preview runtime"
+        },
+        {
+          "id": "asset-status",
+          "type": "status-heading",
+          "label": "Asset status",
+          "behavior": "shows current asset load state"
+        },
+        {
+          "id": "asset-meta",
+          "type": "status-text",
+          "label": "Asset metadata",
+          "behavior": "shows image size or load error"
+        }
+      ]
+    },
+    {
+      "id": "grid",
+      "title": "Grid",
+      "purpose": "define the regular sprite sheet grid",
+      "elements": [
+        {
+          "id": "frame-width",
+          "type": "number-input",
+          "label": "Frame width",
+          "default": 64,
+          "min": 1
+        },
+        {
+          "id": "frame-height",
+          "type": "number-input",
+          "label": "Frame height",
+          "default": 64,
+          "min": 1
+        },
+        {
+          "id": "columns",
+          "type": "number-input",
+          "label": "Columns",
+          "default": 4,
+          "min": 1
+        },
+        {
+          "id": "rows",
+          "type": "number-input",
+          "label": "Rows",
+          "default": 4,
+          "min": 1
+        },
+        {
+          "id": "total-frames",
+          "type": "number-input",
+          "label": "Total frames",
+          "default": null,
+          "min": 1,
+          "placeholder": "defaults to columns × rows"
+        }
+      ]
+    },
+    {
+      "id": "timing",
+      "title": "Timing",
+      "purpose": "control playback timing policy",
+      "elements": [
+        {
+          "id": "fps",
+          "type": "number-input",
+          "label": "FPS",
+          "default": 12,
+          "min": 1
+        },
+        {
+          "id": "duration",
+          "type": "number-input",
+          "label": "Duration (ms)",
+          "default": null,
+          "min": 0,
+          "placeholder": "optional"
+        },
+        {
+          "id": "loop",
+          "type": "checkbox",
+          "label": "Loop animation",
+          "default": true
+        }
+      ],
+      "behavior_notes": [
+        "If only fps is set, playback advances frame-by-frame.",
+        "If only duration is set, frames are resolved by overall progress.",
+        "If both are set, duration has priority and frame skipping is allowed."
+      ]
+    },
+    {
+      "id": "transform",
+      "title": "Transform",
+      "purpose": "position and scale the rendered animation",
+      "elements": [
+        {
+          "id": "position-x",
+          "type": "number-input",
+          "label": "Position X",
+          "default": 160
+        },
+        {
+          "id": "position-y",
+          "type": "number-input",
+          "label": "Position Y",
+          "default": 120
+        },
+        {
+          "id": "scale",
+          "type": "number-input",
+          "label": "Scale",
+          "default": 2,
+          "min": 0.1,
+          "step": 0.1
+        },
+        {
+          "id": "grid-visibility",
+          "type": "number-input",
+          "label": "Canvas zoom grid",
+          "default": 0.4,
+          "min": 0,
+          "max": 1,
+          "step": 0.1
+        }
+      ]
+    },
+    {
+      "id": "canvas",
+      "title": "Canvas",
+      "purpose": "configure preview surface dimensions",
+      "elements": [
+        {
+          "id": "canvas-width",
+          "type": "number-input",
+          "label": "Canvas width",
+          "default": 640,
+          "min": 64
+        },
+        {
+          "id": "canvas-height",
+          "type": "number-input",
+          "label": "Canvas height",
+          "default": 360,
+          "min": 64
+        }
+      ]
+    },
+    {
+      "id": "playback",
+      "title": "Playback",
+      "purpose": "control animation state and inspect runtime status",
+      "elements": [
+        {
+          "id": "play-button",
+          "type": "button",
+          "label": "Play",
+          "action": "start playback"
+        },
+        {
+          "id": "pause-button",
+          "type": "button",
+          "label": "Pause",
+          "action": "pause playback"
+        },
+        {
+          "id": "stop-button",
+          "type": "button",
+          "label": "Stop",
+          "action": "stop playback and reset state"
+        },
+        {
+          "id": "current-frame",
+          "type": "metric",
+          "label": "Frame",
+          "behavior": "shows current resolved frame index"
+        },
+        {
+          "id": "playback-state",
+          "type": "metric",
+          "label": "State",
+          "behavior": "shows idle, playing, paused, or stopped"
+        }
+      ]
+    },
+    {
+      "id": "config",
+      "title": "Config",
+      "purpose": "export current runtime settings as JSON",
+      "elements": [
+        {
+          "id": "save-config",
+          "type": "button",
+          "label": "Save JSON",
+          "action": "downloads a json file"
+        },
+        {
+          "id": "copy-config",
+          "type": "button",
+          "label": "Copy JSON",
+          "action": "copies json to clipboard"
+        },
+        {
+          "id": "config-output",
+          "type": "readonly-textarea",
+          "label": "Config output",
+          "behavior": "shows serialized playground configuration"
+        }
+      ]
+    },
+    {
+      "id": "preview",
+      "title": "Live Preview",
+      "purpose": "display the canvas output of the current runtime configuration",
+      "elements": [
+        {
+          "id": "preview-message",
+          "type": "status-text",
+          "label": "Preview message",
+          "behavior": "communicates current preview state or action result"
+        },
+        {
+          "id": "preview-canvas",
+          "type": "canvas",
+          "label": "Preview canvas",
+          "behavior": "renders current frame using runtime player and canvas renderer"
+        }
+      ]
+    }
+  ],
+  "interaction_rules": [
+    "Changing grid, timing, transform, or canvas inputs immediately recalculates the runtime config.",
+    "Selecting a sprite sheet file loads it into the preview runtime and starts playback.",
+    "Pause preserves the current frame state; stop resets to the initial frame.",
+    "JSON output always mirrors the current UI state.",
+    "Save JSON downloads the current config; Copy JSON writes it to clipboard when permitted."
+  ],
+  "responsive_behavior": {
+    "desktop": "two-column layout with controls on the left and preview on the right",
+    "tablet": "single-column layout with preview under controls",
+    "mobile": "single-column layout and one-column section grids"
+  }
+}
