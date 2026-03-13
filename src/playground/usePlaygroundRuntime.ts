@@ -548,8 +548,8 @@ function readPositiveNumber(value: number | string, fallback: number): number {
     : fallback;
 }
 
-function readOptionalPositiveInteger(value: string): number | undefined {
-  if (value.trim() === "") {
+function readOptionalPositiveInteger(value: number | string): number | undefined {
+  if (isBlankValue(value)) {
     return undefined;
   }
 
@@ -559,8 +559,8 @@ function readOptionalPositiveInteger(value: string): number | undefined {
     : undefined;
 }
 
-function readOptionalPositiveNumber(value: string): number | undefined {
-  if (value.trim() === "") {
+function readOptionalPositiveNumber(value: number | string): number | undefined {
+  if (isBlankValue(value)) {
     return undefined;
   }
 
@@ -570,8 +570,8 @@ function readOptionalPositiveNumber(value: string): number | undefined {
     : undefined;
 }
 
-function readOptionalNonNegativeNumber(value: string): number | undefined {
-  if (value.trim() === "") {
+function readOptionalNonNegativeNumber(value: number | string): number | undefined {
+  if (isBlankValue(value)) {
     return undefined;
   }
 
@@ -589,6 +589,10 @@ function readGridOpacity(value: number | string, fallback: number): number {
   }
 
   return Math.min(1, Math.max(0, normalizedValue));
+}
+
+function isBlankValue(value: number | string): boolean {
+  return typeof value === "string" && value.trim() === "";
 }
 
 function compareFrameFiles(left: File, right: File): number {
