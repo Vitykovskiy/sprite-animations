@@ -8,10 +8,11 @@
 
 - npm-библиотека для sprite-анимации в вебе на `canvas`
 - Загрузка sprite sheet как изображения
+- Загрузка frame sequence как набора отдельных кадров
 - Регулярная сетка кадров через `frameWidth`, `frameHeight`, `columns`, `rows`
 - Runtime API для воспроизведения, паузы, остановки, цикла, масштаба и позиции
 - Тайминг через `fps` и/или `duration`
-- Dev playground для настройки и проверки параметров
+- Dev playground на Vue 3 для настройки и проверки параметров
 - Сохранение конфигурации анимации в JSON
 
 ---
@@ -21,8 +22,7 @@
 - Визуальный editor анимаций
 - Timeline с ручной раскладкой кадров
 - State machine для `idle/run/jump`
-- Поддержка набора отдельных файлов кадров
-- Framework adapters (`React`, `Vue` и др.)
+- Framework adapters для public runtime (`React`, `Vue` и др.)
 - WebGL renderer в первой версии
 - Physics, collisions, audio sync
 
@@ -32,7 +32,7 @@
 
 - Только веб-платформа
 - Только `canvas 2d`
-- Основной формат ассетов — regular grid sprite sheet
+- Основные форматы ассетов — regular grid sprite sheet и frame sequence
 - Playground ориентирован на разработку и тестирование, а не на конечных пользователей
 
 ---
@@ -41,7 +41,6 @@
 
 | Функциональность       | Версия  | Обоснование отсрочки  |
 |------------------------|---------|-----------------------|
-| Поддержка отдельных файлов кадров | v2 | Не критично для первого внутреннего use case |
 | State switching / animation states | v2 | В MVP нет подтвержденного use case |
 | Framework adapters | v2 | Сначала нужен стабильный framework-agnostic core |
 | WebGL renderer | Backlog | Слишком далеко от целей первой версии |

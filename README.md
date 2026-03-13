@@ -13,6 +13,8 @@ npm install @vitykovskiy/canvas-sprite-animations
 - GitHub: https://github.com/Vitykovskiy/sprite-animations
 - Playground: https://vitykovskiy.github.io/sprite-animations/
 
+The hosted playground is a Vue 3 app built on top of the same framework-agnostic runtime API exposed by the package.
+
 ## Usage
 
 ```ts
