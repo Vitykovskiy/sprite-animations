@@ -1,37 +1,14 @@
 # @vitykovskiy/canvas-sprite-animations
 
-`@vitykovskiy/canvas-sprite-animations` is a framework-agnostic TypeScript library for 2D sprite animation on HTML canvas.
+Framework-agnostic TypeScript library for 2D sprite animation on HTML canvas.
 
-The current MVP focus is deliberately narrow:
-- regular grid sprite sheets;
-- runtime playback on `CanvasRenderingContext2D`;
-- timing via `fps` and/or `duration`;
-- predictable positioning and scaling;
-- a separate playground for asset validation and config tuning.
+## Install
 
-## Current package structure
-
-```text
-src/
-  core/
-    animation-player.ts
-    sprite-sheet.ts
-    index.ts
-  renderers/
-    create-canvas-sprite-renderer.ts
-    index.ts
-  types.ts
-  index.ts
+```bash
+npm install @vitykovskiy/canvas-sprite-animations
 ```
 
-## Public entry points
-
-- `@vitykovskiy/canvas-sprite-animations`
-- `@vitykovskiy/canvas-sprite-animations/core`
-- `@vitykovskiy/canvas-sprite-animations/renderers`
-- `@vitykovskiy/canvas-sprite-animations/types`
-
-## Public API draft
+## Usage
 
 ```ts
 import {
@@ -64,69 +41,49 @@ const player = createAnimationPlayer({
 const renderer = createCanvasSpriteRenderer();
 ```
 
-## API responsibilities
+## Entry Points
+
+- `@vitykovskiy/canvas-sprite-animations`
+- `@vitykovskiy/canvas-sprite-animations/core`
+- `@vitykovskiy/canvas-sprite-animations/renderers`
+- `@vitykovskiy/canvas-sprite-animations/types`
+
+## API
 
 - `loadSpriteSheetImage(...)`
   Loads a sprite sheet from a URL, `HTMLImageElement`, or `ImageBitmap`.
 
 - `createSpriteSheet(...)`
-  Defines the sprite grid contract and frame lookup API.
+  Creates a regular-grid sprite sheet model.
 
 - `createAnimationPlayer(...)`
-  Owns playback state and timing policy.
+  Controls playback state and frame timing.
 
 - `createCanvasSpriteRenderer(...)`
-  Draws a resolved frame to a canvas context without owning playback state.
+  Draws a resolved frame to `CanvasRenderingContext2D`.
 
-## Timing policy
+## Timing Policy
 
-- If only `fps` is set, playback advances frame-by-frame using frame duration.
-- If only `duration` is set, frames are resolved from elapsed progress across the full animation.
-- If both `fps` and `duration` are set, `duration` has priority and `fps` acts as an update-frequency cap, which means frame skipping is allowed.
+- If only `fps` is set, playback advances frame-by-frame.
+- If only `duration` is set, frames are resolved from elapsed progress.
+- If both `fps` and `duration` are set, `duration` has priority and `fps` acts as an update cap.
 
-## Canvas rendering contract
+## Scope
 
-- The renderer only draws a requested frame.
-- Positioning is controlled through `{ x, y }` draw options.
-- Scaling is applied at draw time and does not mutate sprite sheet metadata.
+Current MVP scope:
 
-## Status
+- regular grid sprite sheets
+- canvas rendering
+- runtime playback with `fps` and/or `duration`
+- predictable positioning and scaling
 
-This repository is in active MVP setup. The package structure and public API are defined first; asset loading, runtime behavior hardening, playground UX, and publish-ready infrastructure are tracked as separate backlog tasks.
+Not included in MVP:
 
-## Validation
+- JSON atlas support
+- framework adapters
+- WebGL renderer
+- state machine / animation graph
 
-Current scaffold validation commands:
+## License
 
-```bash
-tsc --noEmit -p tsconfig.json
-npm test
-npm run playground:build
-npm pack --dry-run
-```
-
-## Playground
-
-Run the dev playground locally:
-
-```bash
-npm install
-npm run playground:dev
-```
-
-## Package workflow
-
-- `npm run build`
-  Builds library artifacts into `dist/` without bundling the playground.
-
-- `npm test`
-  Rebuilds the library and runs runtime regression tests.
-
-- `npm run check`
-  Runs typecheck, tests, and playground build as a single quality gate.
-
-- `npm run pack:check`
-  Verifies the package contents with `npm pack --dry-run`.
-
-- `npm run playground:build`
-  Emits the dev playground into `playground-dist/` so it does not overwrite library artifacts in `dist/`.
+MIT
