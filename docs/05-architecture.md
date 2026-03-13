@@ -15,8 +15,8 @@
 
 | Компонент       | Зона ответственности         | Технология   |
 |-----------------|------------------------------|--------------|
-| Asset Loader    | Загрузка изображения sprite sheet | Browser image loading / TypeScript |
-| Sprite Model    | Описание сетки кадров и конфигурации анимации | TypeScript |
+| Asset Loader    | Загрузка sprite sheet и отдельных кадров | Browser image loading / TypeScript |
+| Sprite Model    | Описание сетки кадров, frame sequence и конфигурации анимации | TypeScript |
 | Animation Player| Вычисление текущего кадра, тайминга, loop и frame skipping | TypeScript |
 | Canvas Renderer | Отрисовка текущего кадра на `canvas`, масштаб и позиция | Canvas 2D API |
 | Playground      | Настройка параметров, предпросмотр и сохранение конфига | Vite + TypeScript |
@@ -37,13 +37,13 @@
 ## Потоки данных
 
 ```
-[Sprite Sheet Image] --> [Asset Loader] --> [Sprite Model]
+[Sprite Sheet Image / Frame Images] --> [Asset Loader] --> [Sprite Model]
 [Sprite Model] --> [Animation Player] --> [Canvas Renderer]
 [Sprite Model] --> [Playground UI]
 [Animation Player] --> [Playground Preview]
 ```
 
-Разработчик или playground передает в core изображение и конфиг сетки кадров. `Animation Player` вычисляет текущий кадр на основе времени, `fps`, `duration` и режима loop. `Canvas Renderer` получает вычисленный кадр и рисует его в заданной позиции и масштабе.
+Разработчик или playground передает в core либо sprite sheet с конфигом сетки, либо набор отдельных кадров. `Animation Player` вычисляет текущий кадр на основе времени, `fps`, `duration` и режима loop. `Canvas Renderer` получает вычисленный кадр и рисует его в заданной позиции и масштабе независимо от формата ассета.
 
 ---
 
@@ -72,6 +72,7 @@
 src/
   core/
     animation-player.ts
+    frame-sequence.ts
     sprite-sheet.ts
     index.ts
   renderers/

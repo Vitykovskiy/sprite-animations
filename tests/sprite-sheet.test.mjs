@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { createSpriteSheet } from "../dist/core/sprite-sheet.js";
+import { createFrameSequence } from "../dist/core/frame-sequence.js";
 
 test("createSpriteSheet computes frame count from the configured grid", () => {
   const spriteSheet = createSpriteSheet({
@@ -70,5 +71,39 @@ test("createSpriteSheet rejects totalFrames larger than grid capacity", () => {
         },
       }),
     /cannot exceed the capacity/,
+  );
+});
+
+test("createFrameSequence returns frame count from the provided image list", () => {
+  const sequence = createFrameSequence({
+    frames: [
+      { width: 16, height: 16, tag: "frame-1" },
+      { width: 24, height: 24, tag: "frame-2" },
+    ],
+  });
+
+  assert.equal(sequence.getFrameCount(), 2);
+});
+
+test("createFrameSequence resolves frame metadata from the selected image", () => {
+  const frame = { width: 20, height: 12, tag: "frame-2" };
+  const sequence = createFrameSequence({
+    frames: [{ width: 16, height: 16, tag: "frame-1" }, frame],
+  });
+
+  assert.deepEqual(sequence.getFrame(1), {
+    image: frame,
+    x: 0,
+    y: 0,
+    width: 20,
+    height: 12,
+    index: 1,
+  });
+});
+
+test("createFrameSequence rejects an empty frame list", () => {
+  assert.throws(
+    () => createFrameSequence({ frames: [] }),
+    /at least one image/,
   );
 });

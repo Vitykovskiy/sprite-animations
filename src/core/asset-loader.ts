@@ -1,4 +1,7 @@
 import type {
+  FrameImageSource,
+  LoadedFrameImage,
+  LoadFrameSequenceOptions,
   LoadedSpriteSheetImage,
   LoadSpriteSheetImageOptions,
   SpriteSheetImageSource,
@@ -7,6 +10,26 @@ import type {
 export async function loadSpriteSheetImage(
   source: SpriteSheetImageSource,
   options: LoadSpriteSheetImageOptions = {},
+): Promise<LoadedSpriteSheetImage> {
+  return loadImageAsset(source, options);
+}
+
+export async function loadFrameSequence(
+  sources: readonly FrameImageSource[],
+  options: LoadFrameSequenceOptions = {},
+): Promise<LoadedFrameImage[]> {
+  if (!Array.isArray(sources) || sources.length === 0) {
+    throw new Error("sources must contain at least one frame image.");
+  }
+
+  return Promise.all(
+    sources.map((source) => loadImageAsset(source, options)),
+  );
+}
+
+async function loadImageAsset(
+  source: SpriteSheetImageSource,
+  options: LoadSpriteSheetImageOptions,
 ): Promise<LoadedSpriteSheetImage> {
   if (typeof source === "string") {
     return loadImageFromUrl(source, options);
@@ -63,7 +86,7 @@ function waitForImageElement(image: HTMLImageElement): Promise<void> {
 
     const handleError = () => {
       cleanup();
-      reject(new Error("Failed to load sprite sheet image."));
+      reject(new Error("Failed to load image."));
     };
 
     const cleanup = () => {

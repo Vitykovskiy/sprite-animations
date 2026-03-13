@@ -19,7 +19,9 @@ npm install @vitykovskiy/canvas-sprite-animations
 import {
   createAnimationPlayer,
   createCanvasSpriteRenderer,
+  createFrameSequence,
   createSpriteSheet,
+  loadFrameSequence,
   loadSpriteSheetImage,
 } from "@vitykovskiy/canvas-sprite-animations";
 
@@ -46,6 +48,33 @@ const player = createAnimationPlayer({
 const renderer = createCanvasSpriteRenderer();
 ```
 
+```ts
+import {
+  createAnimationPlayer,
+  createCanvasSpriteRenderer,
+  createFrameSequence,
+  loadFrameSequence,
+} from "@vitykovskiy/canvas-sprite-animations";
+
+const loadedFrames = await loadFrameSequence([
+  "/assets/run-01.png",
+  "/assets/run-02.png",
+  "/assets/run-03.png",
+]);
+
+const frameSequence = createFrameSequence({
+  frames: loadedFrames.map((frame) => frame.image),
+});
+
+const player = createAnimationPlayer({
+  totalFrames: frameSequence.getFrameCount(),
+  fps: 12,
+  loop: true,
+});
+
+const renderer = createCanvasSpriteRenderer();
+```
+
 ## Entry Points
 
 - `@vitykovskiy/canvas-sprite-animations`
@@ -58,8 +87,14 @@ const renderer = createCanvasSpriteRenderer();
 - `loadSpriteSheetImage(...)`
   Loads a sprite sheet from a URL, `HTMLImageElement`, or `ImageBitmap`.
 
+- `loadFrameSequence(...)`
+  Loads a frame sequence from an array of URLs, `HTMLImageElement`, or `ImageBitmap`.
+
 - `createSpriteSheet(...)`
   Creates a regular-grid sprite sheet model.
+
+- `createFrameSequence(...)`
+  Creates a frame-sequence model from separate images.
 
 - `createAnimationPlayer(...)`
   Controls playback state and frame timing.
@@ -78,6 +113,7 @@ const renderer = createCanvasSpriteRenderer();
 Current MVP scope:
 
 - regular grid sprite sheets
+- frame sequences from separate images
 - canvas rendering
 - runtime playback with `fps` and/or `duration`
 - predictable positioning and scaling

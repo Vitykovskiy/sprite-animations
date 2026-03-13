@@ -7,12 +7,24 @@ export interface SpriteSheetGrid {
 }
 
 export type SpriteSheetImageSource = string | HTMLImageElement | ImageBitmap;
+export type FrameImageSource = SpriteSheetImageSource;
+export type FrameSequenceImage =
+  | HTMLImageElement
+  | ImageBitmap
+  | HTMLCanvasElement
+  | OffscreenCanvas;
 
 export interface LoadSpriteSheetImageOptions {
   crossOrigin?: string;
 }
 
 export interface LoadedSpriteSheetImage {
+  image: HTMLImageElement | ImageBitmap;
+  width: number;
+  height: number;
+}
+
+export interface LoadedFrameImage {
   image: HTMLImageElement | ImageBitmap;
   width: number;
   height: number;
@@ -31,11 +43,33 @@ export interface FrameRect {
   index: number;
 }
 
+export interface DrawableFrame extends FrameRect {
+  image: CanvasImageSource;
+}
+
 export interface SpriteSheet {
   readonly image: CanvasImageSource;
   readonly grid: Required<SpriteSheetGrid>;
   getFrameCount(): number;
   getFrameRect(frameIndex: number): FrameRect;
+  getFrame(frameIndex: number): DrawableFrame;
+}
+
+export interface FrameSequenceConfig {
+  frames: FrameSequenceImage[];
+}
+
+export interface FrameSequence {
+  readonly frames: readonly FrameSequenceImage[];
+  getFrameCount(): number;
+  getFrame(frameIndex: number): DrawableFrame;
+}
+
+export interface LoadFrameSequenceOptions extends LoadSpriteSheetImageOptions {}
+
+export interface AnimationFrameSource {
+  getFrameCount(): number;
+  getFrame(frameIndex: number): DrawableFrame;
 }
 
 export interface AnimationTimingConfig {
@@ -84,7 +118,7 @@ export interface DrawSpriteOptions {
 export interface CanvasSpriteRenderer {
   draw(
     context: CanvasRenderingContext2D,
-    spriteSheet: SpriteSheet,
+    source: AnimationFrameSource,
     options: DrawSpriteOptions,
   ): void;
 }

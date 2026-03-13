@@ -1,4 +1,9 @@
-import type { FrameRect, SpriteSheet, SpriteSheetConfig } from "../types.js";
+import type {
+  DrawableFrame,
+  FrameRect,
+  SpriteSheet,
+  SpriteSheetConfig,
+} from "../types.js";
 
 export function createSpriteSheet(config: SpriteSheetConfig): SpriteSheet {
   const normalizedGrid = normalizeGrid(config);
@@ -11,6 +16,14 @@ export function createSpriteSheet(config: SpriteSheetConfig): SpriteSheet {
     },
     getFrameRect(frameIndex) {
       return getFrameRect(normalizedGrid, frameIndex);
+    },
+    getFrame(frameIndex) {
+      const frame = getFrameRect(normalizedGrid, frameIndex);
+
+      return {
+        ...frame,
+        image: config.image,
+      };
     },
   };
 }

@@ -1,24 +1,24 @@
 import type {
+  AnimationFrameSource,
   CanvasSpriteRenderer,
   DrawSpriteOptions,
-  SpriteSheet,
 } from "../types.js";
 
 export function createCanvasSpriteRenderer(): CanvasSpriteRenderer {
   return {
     draw(
       context: CanvasRenderingContext2D,
-      spriteSheet: SpriteSheet,
+      source: AnimationFrameSource,
       options: DrawSpriteOptions,
     ) {
-      const frame = spriteSheet.getFrameRect(options.frameIndex);
+      const frame = source.getFrame(options.frameIndex);
       const scale = options.scale ?? 1;
       const destinationWidth = options.destinationWidth ?? frame.width * scale;
       const destinationHeight =
         options.destinationHeight ?? frame.height * scale;
 
       context.drawImage(
-        spriteSheet.image,
+        frame.image,
         frame.x,
         frame.y,
         frame.width,
