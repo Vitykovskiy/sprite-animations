@@ -1,12 +1,13 @@
 {
   "document": {
     "name": "playground-ui-ux-contract",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "last_updated": "2026-03-13",
     "scope": "sprite-animations dev playground",
     "source_of_truth": [
-      "index.html",
+      "src/playground/App.vue",
       "src/playground/main.ts",
+      "src/playground/usePlaygroundRuntime.ts",
       "src/playground/styles.css"
     ],
     "maintenance_rule": "Update this file whenever new UI elements are added, removed, renamed, or behaviorally changed."
@@ -336,13 +337,18 @@
     }
   ],
   "interaction_rules": [
-    "Changing grid, timing, transform, or canvas inputs immediately recalculates the runtime config.",
+    "Changing grid, timing, transform, or canvas inputs immediately recalculates the runtime config through Vue reactive state.",
     "Selecting sprite-sheet mode loads a single image and starts playback.",
     "Selecting frame-sequence mode loads a folder of frame images sorted by relative path or file name and starts playback.",
     "Grid controls are disabled while frame-sequence mode is active.",
     "Pause preserves the current frame state; stop resets to the initial frame.",
     "JSON output always mirrors the current UI state.",
     "Save JSON downloads the current config; Copy JSON writes it to clipboard when permitted."
+  ],
+  "implementation_notes": [
+    "The playground UI is implemented in Vue 3 using Composition API.",
+    "Canvas preview and asset orchestration live in a dedicated composable instead of imperative DOM bindings.",
+    "The Vue layer is internal to the playground and does not change the framework-agnostic public runtime API."
   ],
   "responsive_behavior": {
     "desktop": "two-column layout with controls on the left and preview on the right",

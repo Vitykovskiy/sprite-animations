@@ -32,7 +32,7 @@
   },
   "scripts": {
     "clean": "node -e \"import('node:fs/promises').then(fs => fs.rm('dist', { recursive: true, force: true }))\"",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "build": "npm run clean && tsc -p tsconfig.build.json",
     "build:types": "tsc -p tsconfig.build.json",
     "test": "npm run build && node --test tests/**/*.test.mjs",
@@ -61,7 +61,10 @@
     "node": ">=22.0.0"
   },
   "devDependencies": {
+    "@vitejs/plugin-vue": "^6.0.1",
     "typescript": "^5.8.3",
-    "vite": "^7.1.5"
+    "vite": "^7.1.5",
+    "vue": "^3.5.13",
+    "vue-tsc": "^3.0.7"
   }
 }

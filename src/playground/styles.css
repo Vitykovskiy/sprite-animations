@@ -96,9 +96,9 @@ button {
 .field span,
 .metric-label,
 .status-label,
-#preview-message,
+.preview-message,
 .preview-subtitle,
-#asset-meta {
+.asset-meta-row {
   margin: 0;
 }
 
@@ -327,7 +327,7 @@ button:hover {
   font-size: 11px;
 }
 
-#config-output {
+.panel-section textarea {
   min-height: 136px;
   margin-top: 10px;
   resize: vertical;
@@ -356,7 +356,7 @@ button:hover {
   font-size: 14px;
 }
 
-#preview-message {
+.preview-message {
   margin-top: 10px;
   color: rgba(26, 26, 26, 0.66);
   font-size: 13px;
@@ -377,7 +377,7 @@ button:hover {
   box-shadow: var(--shadow-card);
 }
 
-#preview-canvas {
+.preview-canvas {
   display: block;
   max-width: 100%;
   max-height: min(70vh, 640px);
