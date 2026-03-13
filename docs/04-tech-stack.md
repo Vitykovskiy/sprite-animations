@@ -73,6 +73,8 @@
   - изолировать Vue-слой от public API библиотеки
   - для typecheck playground использовать `vue-tsc`
 
+Подробный кодстайл для frontend/Vue зафиксирован отдельно в `docs/frontend-styleguide.md`.
+
 ### Vitest
 - Официальная документация: https://vitest.dev/guide/
 - Best practices:

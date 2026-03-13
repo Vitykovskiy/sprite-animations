@@ -46,6 +46,7 @@
 | `docs/02-business-requirements.md` | Требования                   |
 | `docs/03-scope-and-boundaries.md`  | Рамки проекта                |
 | `docs/04-tech-stack.md`       | Технологический стек               |
+| `docs/frontend-styleguide.md` | Кодстайл и правила frontend/Vue    |
 | `docs/05-architecture.md`     | Архитектура                        |
 | `docs/06-decision-log.md`     | Журнал решений                     |
 | `docs/07-workflow.md`         | Рабочий процесс                    |

@@ -92,6 +92,7 @@ Environment Check
 | Изменение архитектуры        | `docs/05-architecture.md` + `docs/06-decision-log.md` |
 | Изменение требований         | `docs/02-business-requirements.md`               |
 | Изменение стека              | `docs/04-tech-stack.md`                          |
+| Изменение frontend-кодстайла | `docs/frontend-styleguide.md`                    |
 | Новое допущение              | `docs/06-decision-log.md`                        |
 | Новая интеграция             | `docs/09-integrations.md`                        |
 | Изменение UI/UX элементов playground или других интерфейсов | `docs/11-ui-ux-contract.json` |
