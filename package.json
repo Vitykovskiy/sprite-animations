@@ -1,5 +1,5 @@
 {
-  "name": "sprite-animations",
+  "name": "@vitykovskiy/canvas-sprite-animations",
   "version": "0.1.0",
   "description": "Framework-agnostic sprite animation library for HTML canvas.",
   "type": "module",
@@ -48,7 +48,7 @@
     "canvas",
     "typescript"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Vitykovskiy/sprite-animations.git"
