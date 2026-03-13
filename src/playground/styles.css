@@ -41,11 +41,13 @@ body {
 
 button,
 input,
+select,
 textarea {
   font: inherit;
 }
 
 input,
+select,
 textarea,
 button {
   border: 1px solid var(--line);
@@ -123,6 +125,10 @@ button {
 
 .panel-section:last-child {
   margin-bottom: 14px;
+}
+
+.panel-section.is-disabled {
+  opacity: 0.58;
 }
 
 .panel-section h2 {
@@ -241,6 +247,7 @@ button {
 }
 
 input,
+select,
 textarea {
   width: 100%;
   padding: 9px 10px;
@@ -248,10 +255,18 @@ textarea {
 }
 
 input:focus,
+select:focus,
 textarea:focus {
   outline: 2px solid rgba(244, 184, 79, 0.4);
   outline-offset: 1px;
   border-color: rgba(244, 184, 79, 0.75);
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 button {

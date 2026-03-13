@@ -1,8 +1,8 @@
 {
   "document": {
     "name": "playground-ui-ux-contract",
-    "version": "1.0.0",
-    "last_updated": "2026-03-11",
+    "version": "1.1.0",
+    "last_updated": "2026-03-13",
     "scope": "sprite-animations dev playground",
     "source_of_truth": [
       "index.html",
@@ -18,7 +18,7 @@
       "designer"
     ],
     "primary_jobs": [
-      "load a local sprite sheet",
+      "load a local sprite sheet or frame folder",
       "configure grid and timing",
       "preview animation on canvas",
       "save or copy JSON configuration"
@@ -53,38 +53,55 @@
     ]
   },
   "visual_language": {
-    "theme": "warm light editorial canvas lab",
+    "theme": "minimal turquoise canvas lab",
     "fonts": {
-      "primary": "IBM Plex Sans",
-      "monospace": "IBM Plex Mono"
+      "primary": "Aptos",
+      "monospace": "Cascadia Code"
     },
     "tokens": {
-      "background": "#f5f1e8",
-      "text": "#231b12",
-      "muted_text": "#6f6154",
-      "accent": "#0f766e",
-      "panel_surface": "rgba(255, 252, 247, 0.92)",
-      "panel_surface_strong": "rgba(255, 248, 238, 0.98)"
+      "background": "#5dd4cb",
+      "text": "#1a1a1a",
+      "muted_text": "#4a4a4a",
+      "accent": "#f4b84f",
+      "panel_surface": "rgba(255, 255, 255, 0.9)",
+      "panel_surface_strong": "#ffffff"
     },
     "shape": {
-      "panel_radius_px": 22,
-      "section_radius_px": 18,
-      "input_radius_px": 14
+      "panel_radius_px": 24,
+      "section_radius_px": 16,
+      "input_radius_px": 12
     }
   },
   "sections": [
     {
       "id": "asset",
       "title": "Asset",
-      "purpose": "load and validate a local sprite sheet",
+      "purpose": "load and validate a local sprite sheet or frame sequence",
       "elements": [
+        {
+          "id": "asset-mode",
+          "type": "select",
+          "label": "Mode",
+          "default": "sprite-sheet",
+          "options": [
+            "sprite-sheet",
+            "frame-sequence"
+          ],
+          "behavior": "switches the asset loading mode and updates the picker and grid availability"
+        },
         {
           "id": "asset-file",
           "type": "file-input",
-          "label": "Sprite sheet file",
+          "label": "File",
           "required": false,
           "accept": "image/*",
-          "behavior": "loads a local image and initializes preview runtime"
+          "behavior": "loads a local image or a selected folder of frame images and initializes preview runtime"
+        },
+        {
+          "id": "asset-picker-label",
+          "type": "dynamic-label",
+          "label": "Select image / Select folder",
+          "behavior": "changes with the selected asset mode"
         },
         {
           "id": "asset-status",
@@ -104,6 +121,9 @@
       "id": "grid",
       "title": "Grid",
       "purpose": "define the regular sprite sheet grid",
+      "state": {
+        "disabled_when": "asset-mode = frame-sequence"
+      },
       "elements": [
         {
           "id": "frame-width",
@@ -139,7 +159,7 @@
           "label": "Total frames",
           "default": null,
           "min": 1,
-          "placeholder": "defaults to columns × rows"
+          "placeholder": "defaults to columns x rows"
         }
       ]
     },
@@ -204,7 +224,7 @@
         {
           "id": "grid-visibility",
           "type": "number-input",
-          "label": "Canvas zoom grid",
+          "label": "Grid opacity",
           "default": 0.4,
           "min": 0,
           "max": 1,
@@ -297,7 +317,7 @@
     },
     {
       "id": "preview",
-      "title": "Live Preview",
+      "title": "Preview",
       "purpose": "display the canvas output of the current runtime configuration",
       "elements": [
         {
@@ -317,7 +337,9 @@
   ],
   "interaction_rules": [
     "Changing grid, timing, transform, or canvas inputs immediately recalculates the runtime config.",
-    "Selecting a sprite sheet file loads it into the preview runtime and starts playback.",
+    "Selecting sprite-sheet mode loads a single image and starts playback.",
+    "Selecting frame-sequence mode loads a folder of frame images sorted by relative path or file name and starts playback.",
+    "Grid controls are disabled while frame-sequence mode is active.",
     "Pause preserves the current frame state; stop resets to the initial frame.",
     "JSON output always mirrors the current UI state.",
     "Save JSON downloads the current config; Copy JSON writes it to clipboard when permitted."

@@ -3,16 +3,22 @@ import "../playground/styles.css";
 import {
   createAnimationPlayer,
   createCanvasSpriteRenderer,
+  createFrameSequence,
   createSpriteSheet,
+  loadFrameSequence,
   loadSpriteSheetImage,
 } from "../index.js";
 import type {
+  AnimationFrameSource,
   AnimationPlayer,
+  FrameSequence,
+  LoadedFrameImage,
   LoadedSpriteSheetImage,
   SpriteSheet,
 } from "../types.js";
 
 interface PlaygroundConfig {
+  assetType: "sprite-sheet" | "frame-sequence";
   frameWidth: number;
   frameHeight: number;
   columns: number;
@@ -35,9 +41,12 @@ interface PlaygroundConfig {
 const renderer = createCanvasSpriteRenderer();
 
 const elements = {
+  assetMode: getSelectElement<HTMLSelectElement>("asset-mode"),
   assetFile: getInputElement<HTMLInputElement>("asset-file"),
+  assetPickerLabel: getElement<HTMLElement>("asset-picker-label"),
   assetStatus: getElement<HTMLElement>("asset-status"),
   assetMeta: getElement<HTMLElement>("asset-meta"),
+  gridSection: getElement<HTMLElement>("grid-section"),
   frameWidth: getInputElement<HTMLInputElement>("frame-width"),
   frameHeight: getInputElement<HTMLInputElement>("frame-height"),
   columns: getInputElement<HTMLInputElement>("columns"),
@@ -73,17 +82,23 @@ if (!previewContext) {
 const context: CanvasRenderingContext2D = previewContext;
 
 let loadedImage: LoadedSpriteSheetImage | null = null;
+let loadedFrames: LoadedFrameImage[] = [];
 let spriteSheet: SpriteSheet | null = null;
+let frameSequence: FrameSequence | null = null;
+let animationSource: AnimationFrameSource | null = null;
 let player: AnimationPlayer | null = null;
 let previousTimestamp = 0;
-let activeObjectUrl: string | null = null;
+let activeObjectUrls: string[] = [];
 
 bindEvents();
+syncAssetMode();
+updateAssetStatus();
 syncCanvasSize();
 syncRuntime({ autoplay: false });
 window.requestAnimationFrame(tick);
 
 function bindEvents(): void {
+  elements.assetMode.addEventListener("change", handleAssetModeChange);
   elements.assetFile.addEventListener("change", handleAssetSelection);
 
   const runtimeInputs = [
@@ -129,32 +144,43 @@ function bindEvents(): void {
 }
 
 async function handleAssetSelection(): Promise<void> {
-  const file = elements.assetFile.files?.[0];
+  const files = readSelectedFiles();
 
-  if (!file) {
-    loadedImage = null;
-    spriteSheet = null;
-    player = null;
+  if (files.length === 0) {
+    resetLoadedAssets();
     updateAssetStatus();
     drawPreviewFrame();
     return;
   }
 
-  if (activeObjectUrl) {
-    URL.revokeObjectURL(activeObjectUrl);
-  }
-
-  activeObjectUrl = URL.createObjectURL(file);
+  releaseActiveObjectUrls();
 
   try {
-    loadedImage = await loadSpriteSheetImage(activeObjectUrl);
-    elements.previewMessage.textContent = "Image loaded.";
-    updateAssetStatus(file.name);
+    if (isFrameSequenceMode()) {
+      const sortedFiles = [...files].sort(compareFrameFiles);
+      activeObjectUrls = sortedFiles.map((file) => URL.createObjectURL(file));
+      loadedFrames = await loadFrameSequence(activeObjectUrls);
+      loadedImage = null;
+      elements.previewMessage.textContent = "Frames loaded.";
+      updateAssetStatus(`${loadedFrames.length} frames`);
+    } else {
+      const [file] = files;
+
+      if (!file) {
+        throw new Error("No image selected.");
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      activeObjectUrls = [objectUrl];
+      loadedImage = await loadSpriteSheetImage(objectUrl);
+      loadedFrames = [];
+      elements.previewMessage.textContent = "Image loaded.";
+      updateAssetStatus(file.name);
+    }
+
     syncRuntime({ autoplay: true });
   } catch (error) {
-    loadedImage = null;
-    spriteSheet = null;
-    player = null;
+    resetLoadedAssets();
     const message =
       error instanceof Error ? error.message : "Failed to load file.";
     elements.assetStatus.textContent = "Load failed";
@@ -166,32 +192,52 @@ async function handleAssetSelection(): Promise<void> {
 
 function syncRuntime(options: { autoplay: boolean }): void {
   syncCanvasSize();
+  syncAssetMode();
 
   const config = readConfig();
   elements.configOutput.value = serializeConfig(config);
 
-  if (!loadedImage) {
+  if (!hasLoadedAsset()) {
+    animationSource = null;
     updatePlaybackMetrics();
     drawPreviewFrame();
     return;
   }
 
   try {
-    spriteSheet = createSpriteSheet({
-      image: loadedImage.image,
-      grid: {
-        frameWidth: config.frameWidth,
-        frameHeight: config.frameHeight,
-        columns: config.columns,
-        rows: config.rows,
-        ...(config.totalFrames === undefined
-          ? {}
-          : { totalFrames: config.totalFrames }),
-      },
-    });
+    if (isFrameSequenceMode()) {
+      frameSequence = createFrameSequence({
+        frames: loadedFrames.map((frame) => frame.image),
+      });
+      spriteSheet = null;
+      animationSource = frameSequence;
+    } else {
+      if (!loadedImage) {
+        throw new Error("No sprite sheet image loaded.");
+      }
+
+      spriteSheet = createSpriteSheet({
+        image: loadedImage.image,
+        grid: {
+          frameWidth: config.frameWidth,
+          frameHeight: config.frameHeight,
+          columns: config.columns,
+          rows: config.rows,
+          ...(config.totalFrames === undefined
+            ? {}
+            : { totalFrames: config.totalFrames }),
+        },
+      });
+      frameSequence = null;
+      animationSource = spriteSheet;
+    }
+
+    if (!animationSource) {
+      throw new Error("No animation source available.");
+    }
 
     player = createAnimationPlayer({
-      totalFrames: spriteSheet.getFrameCount(),
+      totalFrames: animationSource.getFrameCount(),
       ...(config.fps === undefined ? {} : { fps: config.fps }),
       ...(config.duration === undefined ? {} : { duration: config.duration }),
       loop: config.loop,
@@ -234,14 +280,14 @@ function drawPreviewFrame(): void {
   context.fillRect(0, 0, elements.previewCanvas.width, elements.previewCanvas.height);
   drawCanvasGrid(visibility);
 
-  if (!loadedImage || !spriteSheet || !player) {
+  if (!animationSource || !player) {
     drawPlaceholder();
     return;
   }
 
   const snapshot = player.getSnapshot();
 
-  renderer.draw(context, spriteSheet, {
+  renderer.draw(context, animationSource, {
     frameIndex: snapshot.frameIndex,
     position: config.position,
     scale: config.scale,
@@ -277,7 +323,7 @@ function drawPlaceholder(): void {
   context.textAlign = "center";
   context.font = '500 16px "Aptos", "Segoe UI", sans-serif';
   context.fillText(
-    "Select an image.",
+    isFrameSequenceMode() ? "Select a folder." : "Select an image.",
     elements.previewCanvas.width / 2,
     elements.previewCanvas.height / 2,
   );
@@ -285,14 +331,28 @@ function drawPlaceholder(): void {
 }
 
 function updateAssetStatus(fileName?: string): void {
-  if (!loadedImage) {
+  if (!hasLoadedAsset()) {
     elements.assetStatus.textContent = "No asset loaded";
-    elements.assetMeta.textContent = "Select a local image.";
+    elements.assetMeta.textContent = isFrameSequenceMode()
+      ? "Select a folder with frames."
+      : "Select a local image.";
     return;
   }
 
-  elements.assetStatus.textContent = fileName ?? "Image loaded";
-  elements.assetMeta.textContent = `${loadedImage.width} x ${loadedImage.height} px`;
+  elements.assetStatus.textContent = fileName ?? "Asset loaded";
+
+  if (isFrameSequenceMode()) {
+    const firstFrame = loadedFrames[0];
+
+    elements.assetMeta.textContent = firstFrame
+      ? `${loadedFrames.length} frames, first ${firstFrame.width} x ${firstFrame.height} px`
+      : `${loadedFrames.length} frames`;
+    return;
+  }
+
+  elements.assetMeta.textContent = loadedImage
+    ? `${loadedImage.width} x ${loadedImage.height} px`
+    : "Select a local image.";
 }
 
 function updatePlaybackMetrics(): void {
@@ -310,6 +370,7 @@ function syncCanvasSize(): void {
 
 function readConfig(): PlaygroundConfig {
   return {
+    assetType: isFrameSequenceMode() ? "frame-sequence" : "sprite-sheet",
     frameWidth: readNumber(elements.frameWidth, 64),
     frameHeight: readNumber(elements.frameHeight, 64),
     columns: readNumber(elements.columns, 4),
@@ -375,6 +436,86 @@ function readOptionalNumber(element: HTMLInputElement): number | undefined {
   return Number.isFinite(value) ? value : undefined;
 }
 
+function handleAssetModeChange(): void {
+  resetLoadedAssets();
+  elements.assetFile.value = "";
+  syncAssetMode();
+  updateAssetStatus();
+  elements.previewMessage.textContent = isFrameSequenceMode()
+    ? "Select a folder."
+    : "Select an image.";
+  syncRuntime({ autoplay: false });
+}
+
+function syncAssetMode(): void {
+  const frameSequenceMode = isFrameSequenceMode();
+
+  elements.assetPickerLabel.textContent = frameSequenceMode
+    ? "Select folder"
+    : "Select image";
+
+  elements.assetFile.multiple = frameSequenceMode;
+
+  if (frameSequenceMode) {
+    elements.assetFile.setAttribute("webkitdirectory", "");
+    elements.assetFile.setAttribute("directory", "");
+  } else {
+    elements.assetFile.removeAttribute("webkitdirectory");
+    elements.assetFile.removeAttribute("directory");
+  }
+
+  const gridInputs = [
+    elements.frameWidth,
+    elements.frameHeight,
+    elements.columns,
+    elements.rows,
+    elements.totalFrames,
+  ];
+
+  gridInputs.forEach((input) => {
+    input.disabled = frameSequenceMode;
+  });
+
+  elements.gridSection.classList.toggle("is-disabled", frameSequenceMode);
+}
+
+function resetLoadedAssets(): void {
+  loadedImage = null;
+  loadedFrames = [];
+  spriteSheet = null;
+  frameSequence = null;
+  animationSource = null;
+  player = null;
+  releaseActiveObjectUrls();
+}
+
+function releaseActiveObjectUrls(): void {
+  activeObjectUrls.forEach((url) => URL.revokeObjectURL(url));
+  activeObjectUrls = [];
+}
+
+function hasLoadedAsset(): boolean {
+  return loadedImage !== null || loadedFrames.length > 0;
+}
+
+function isFrameSequenceMode(): boolean {
+  return elements.assetMode.value === "frame-sequence";
+}
+
+function readSelectedFiles(): File[] {
+  return Array.from(elements.assetFile.files ?? []);
+}
+
+function compareFrameFiles(left: File, right: File): number {
+  const leftPath = left.webkitRelativePath || left.name;
+  const rightPath = right.webkitRelativePath || right.name;
+
+  return leftPath.localeCompare(rightPath, undefined, {
+    numeric: true,
+    sensitivity: "base",
+  });
+}
+
 function getElement<T extends HTMLElement>(id: string): T {
   const element = document.getElementById(id);
 
@@ -386,5 +527,9 @@ function getElement<T extends HTMLElement>(id: string): T {
 }
 
 function getInputElement<T extends HTMLInputElement>(id: string): T {
+  return getElement<T>(id);
+}
+
+function getSelectElement<T extends HTMLSelectElement>(id: string): T {
   return getElement<T>(id);
 }

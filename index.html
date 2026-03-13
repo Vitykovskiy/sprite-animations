@@ -19,10 +19,17 @@
         <section class="panel-section">
           <h2>Asset</h2>
           <label class="field">
+            <span>Mode</span>
+            <select id="asset-mode">
+              <option value="sprite-sheet">Sprite sheet</option>
+              <option value="frame-sequence">Frame sequence</option>
+            </select>
+          </label>
+          <label class="field">
             <span>File</span>
             <div class="upload-field">
               <span class="upload-icon" aria-hidden="true"></span>
-              <span>Select image</span>
+              <span id="asset-picker-label">Select image</span>
               <input id="asset-file" type="file" accept="image/*" />
             </div>
           </label>
@@ -31,11 +38,11 @@
             <strong id="asset-status">No asset loaded</strong>
           </div>
           <div class="asset-meta-row">
-            <span id="asset-meta">Choose a local sprite sheet image to begin.</span>
+            <span id="asset-meta">Select a local image.</span>
           </div>
         </section>
 
-        <section class="panel-section grid-two">
+        <section id="grid-section" class="panel-section grid-two">
           <h2>Grid</h2>
           <label class="field">
             <span>Frame width</span>
