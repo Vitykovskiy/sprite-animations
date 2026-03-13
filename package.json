@@ -1,6 +1,6 @@
 {
   "name": "@vitykovskiy/canvas-sprite-animations",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Framework-agnostic sprite animation library for HTML canvas.",
   "type": "module",
   "private": false,
