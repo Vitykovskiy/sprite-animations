@@ -1,6 +1,6 @@
-# sprite-animations
+# @vitykovskiy/canvas-sprite-animations
 
-`sprite-animations` is a framework-agnostic TypeScript library for 2D sprite animation on HTML canvas.
+`@vitykovskiy/canvas-sprite-animations` is a framework-agnostic TypeScript library for 2D sprite animation on HTML canvas.
 
 The current MVP focus is deliberately narrow:
 - regular grid sprite sheets;
@@ -26,10 +26,10 @@ src/
 
 ## Public entry points
 
-- `sprite-animations`
-- `sprite-animations/core`
-- `sprite-animations/renderers`
-- `sprite-animations/types`
+- `@vitykovskiy/canvas-sprite-animations`
+- `@vitykovskiy/canvas-sprite-animations/core`
+- `@vitykovskiy/canvas-sprite-animations/renderers`
+- `@vitykovskiy/canvas-sprite-animations/types`
 
 ## Public API draft
 
@@ -39,7 +39,7 @@ import {
   createCanvasSpriteRenderer,
   createSpriteSheet,
   loadSpriteSheetImage,
-} from "sprite-animations";
+} from "@vitykovskiy/canvas-sprite-animations";
 
 const loadedImage = await loadSpriteSheetImage("/assets/hero.png");
 
