@@ -12,22 +12,26 @@
   <body>
     <div class="playground-shell">
       <aside class="control-panel">
-        <div class="panel-header">
-          <p class="eyebrow">Sprite Animations</p>
-          <h1>Playground</h1>
-          <p class="subtitle">
-            Tune grid, timing, position, and scale against a live canvas preview.
-          </p>
+        <div class="panel-brand">
+          <p class="brand-mark">Sprite Animations</p>
+          <p class="brand-note">Minimal runtime tuning</p>
         </div>
 
         <section class="panel-section">
           <h2>Asset</h2>
           <label class="field">
             <span>Sprite sheet file</span>
-            <input id="asset-file" type="file" accept="image/*" />
+            <div class="upload-field">
+              <span class="upload-icon" aria-hidden="true"></span>
+              <span>Upload sprite sheet</span>
+              <input id="asset-file" type="file" accept="image/*" />
+            </div>
           </label>
-          <div class="status-card">
+          <div class="status-inline">
+            <span class="status-label">Status</span>
             <strong id="asset-status">No asset loaded</strong>
+          </div>
+          <div class="asset-meta-row">
             <span id="asset-meta">Choose a local sprite sheet image to begin.</span>
           </div>
         </section>
@@ -52,7 +56,7 @@
           </label>
           <label class="field field-full">
             <span>Total frames</span>
-            <input id="total-frames" type="number" min="1" placeholder="defaults to columns × rows" />
+            <input id="total-frames" type="number" min="1" placeholder="defaults to columns x rows" />
           </label>
         </section>
 
@@ -107,7 +111,7 @@
         <section class="panel-section">
           <h2>Playback</h2>
           <div class="button-row">
-            <button id="play-button" type="button">Play</button>
+            <button id="play-button" type="button" class="button-primary">Play</button>
             <button id="pause-button" type="button">Pause</button>
             <button id="stop-button" type="button">Stop</button>
           </div>
@@ -141,10 +145,10 @@
       <main class="preview-panel">
         <div class="preview-header">
           <div>
-            <p class="eyebrow">Live Preview</p>
-            <h2>Canvas runtime</h2>
+            <h1>Sprite Animation Playground</h1>
+            <p class="preview-subtitle">Minimalist UI/UX preview workspace</p>
           </div>
-          <p id="preview-message">Load a sprite sheet to start previewing frames.</p>
+          <p id="preview-message">Upload a sprite sheet to begin.</p>
         </div>
         <div class="canvas-stage">
           <canvas id="preview-canvas" width="640" height="360"></canvas>

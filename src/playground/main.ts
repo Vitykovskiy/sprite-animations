@@ -148,7 +148,8 @@ async function handleAssetSelection(): Promise<void> {
 
   try {
     loadedImage = await loadSpriteSheetImage(activeObjectUrl);
-    elements.previewMessage.textContent = "Asset loaded. Tweak the controls and preview the runtime behavior.";
+    elements.previewMessage.textContent =
+      "Preview ready. Adjust the controls on the left to refine the runtime.";
     updateAssetStatus(file.name);
     syncRuntime({ autoplay: true });
   } catch (error) {
@@ -230,7 +231,7 @@ function drawPreviewFrame(): void {
   const visibility = readNumber(elements.gridVisibility, 0.4);
 
   context.clearRect(0, 0, elements.previewCanvas.width, elements.previewCanvas.height);
-  context.fillStyle = "#f8f4ec";
+  context.fillStyle = "#ffffff";
   context.fillRect(0, 0, elements.previewCanvas.width, elements.previewCanvas.height);
   drawCanvasGrid(visibility);
 
@@ -251,7 +252,7 @@ function drawPreviewFrame(): void {
 function drawCanvasGrid(visibility: number): void {
   const alpha = Math.max(0, Math.min(1, visibility));
   context.save();
-  context.strokeStyle = `rgba(15, 118, 110, ${alpha})`;
+  context.strokeStyle = `rgba(26, 26, 26, ${alpha * 0.12})`;
   context.lineWidth = 1;
 
   for (let x = 0; x < elements.previewCanvas.width; x += 32) {
@@ -273,9 +274,9 @@ function drawCanvasGrid(visibility: number): void {
 
 function drawPlaceholder(): void {
   context.save();
-  context.fillStyle = "#6f6154";
+  context.fillStyle = "rgba(26, 26, 26, 0.56)";
   context.textAlign = "center";
-  context.font = '600 16px "IBM Plex Sans", sans-serif';
+  context.font = '500 16px "Aptos", "Segoe UI", sans-serif';
   context.fillText(
     "Load a sprite sheet to preview the animation runtime.",
     elements.previewCanvas.width / 2,
@@ -292,7 +293,7 @@ function updateAssetStatus(fileName?: string): void {
   }
 
   elements.assetStatus.textContent = fileName ?? "Sprite sheet loaded";
-  elements.assetMeta.textContent = `${loadedImage.width} × ${loadedImage.height}px`;
+  elements.assetMeta.textContent = `${loadedImage.width} x ${loadedImage.height} px`;
 }
 
 function updatePlaybackMetrics(): void {
