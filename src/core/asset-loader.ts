@@ -22,9 +22,7 @@ export async function loadFrameSequence(
     throw new Error("sources must contain at least one frame image.");
   }
 
-  return Promise.all(
-    sources.map((source) => loadImageAsset(source, options)),
-  );
+  return Promise.all(sources.map((source) => loadImageAsset(source, options)));
 }
 
 async function loadImageAsset(

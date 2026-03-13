@@ -6,18 +6,19 @@
     "scope": "sprite-animations dev playground",
     "source_of_truth": [
       "src/playground/App.vue",
+      "src/playground/components/types.ts",
+      "src/playground/components/PlaygroundSidebar.vue",
+      "src/playground/components/PlaygroundPreview.vue",
       "src/playground/main.ts",
       "src/playground/usePlaygroundRuntime.ts",
+      "src/playground/types/runtime.ts",
       "src/playground/styles.css"
     ],
     "maintenance_rule": "Update this file whenever new UI elements are added, removed, renamed, or behaviorally changed."
   },
   "product_context": {
     "surface": "dev playground",
-    "audience": [
-      "developer",
-      "designer"
-    ],
+    "audience": ["developer", "designer"],
     "primary_jobs": [
       "load a local sprite sheet or frame folder",
       "configure grid and timing",
@@ -46,10 +47,7 @@
         "id": "preview-panel",
         "role": "live runtime preview",
         "position": "right on desktop, bottom on mobile",
-        "sections": [
-          "preview-header",
-          "canvas-stage"
-        ]
+        "sections": ["preview-header", "canvas-stage"]
       }
     ]
   },
@@ -84,10 +82,7 @@
           "type": "select",
           "label": "Mode",
           "default": "sprite-sheet",
-          "options": [
-            "sprite-sheet",
-            "frame-sequence"
-          ],
+          "options": ["sprite-sheet", "frame-sequence"],
           "behavior": "switches the asset loading mode and updates the picker and grid availability"
         },
         {
@@ -347,7 +342,8 @@
   ],
   "implementation_notes": [
     "The playground UI is implemented in Vue 3 using Composition API.",
-    "Canvas preview and asset orchestration live in a dedicated composable instead of imperative DOM bindings.",
+    "Canvas preview and asset orchestration live in a dedicated composable/runtime context instead of imperative DOM bindings.",
+    "Sidebar and preview components read shared state from the runtime composable instead of using prop drilling through App.",
     "The Vue layer is internal to the playground and does not change the framework-agnostic public runtime API."
   ],
   "responsive_behavior": {

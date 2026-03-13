@@ -6,7 +6,5 @@
     "src/core/**/*.ts",
     "src/renderers/**/*.ts"
   ],
-  "exclude": [
-    "src/playground/**/*"
-  ]
+  "exclude": ["src/playground/**/*"]
 }

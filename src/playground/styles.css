@@ -34,8 +34,16 @@ body {
   font-family: "Aptos", "Segoe UI", sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.28), transparent 22%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.18), transparent 28%),
+    radial-gradient(
+      circle at top right,
+      rgba(255, 255, 255, 0.28),
+      transparent 22%
+    ),
+    radial-gradient(
+      circle at bottom left,
+      rgba(255, 255, 255, 0.18),
+      transparent 28%
+    ),
     linear-gradient(180deg, #6be0d7 0%, var(--bg) 100%);
 }
 
@@ -188,7 +196,9 @@ button {
   border-radius: var(--radius-sm);
   background: var(--input);
   cursor: pointer;
-  transition: background-color 140ms ease, border-color 140ms ease;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease;
 }
 
 .upload-field:hover {

@@ -65,7 +65,7 @@ export interface FrameSequence {
   getFrame(frameIndex: number): DrawableFrame;
 }
 
-export interface LoadFrameSequenceOptions extends LoadSpriteSheetImageOptions {}
+export type LoadFrameSequenceOptions = LoadSpriteSheetImageOptions;
 
 export interface AnimationFrameSource {
   getFrameCount(): number;

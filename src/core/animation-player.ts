@@ -85,8 +85,7 @@ export function createAnimationPlayer(
 
       const frameDurationMs = 1000 / normalizedConfig.fps;
       const nextFrameIndex =
-        normalizedConfig.initialFrame +
-        Math.floor(elapsedMs / frameDurationMs);
+        normalizedConfig.initialFrame + Math.floor(elapsedMs / frameDurationMs);
 
       if (normalizedConfig.loop) {
         frameIndex = nextFrameIndex % normalizedConfig.totalFrames;
@@ -121,7 +120,9 @@ function normalizeAnimationPlayerConfig(
   config: AnimationPlayerConfig,
 ): Readonly<NormalizedAnimationPlayerConfig> {
   if (!Number.isInteger(config.totalFrames) || config.totalFrames <= 0) {
-    throw new Error("Animation player requires a positive integer totalFrames.");
+    throw new Error(
+      "Animation player requires a positive integer totalFrames.",
+    );
   }
 
   if (config.fps !== undefined && config.fps <= 0) {
@@ -129,7 +130,9 @@ function normalizeAnimationPlayerConfig(
   }
 
   if (config.duration !== undefined && config.duration < 0) {
-    throw new Error("duration must be greater than or equal to 0 when provided.");
+    throw new Error(
+      "duration must be greater than or equal to 0 when provided.",
+    );
   }
 
   const initialFrame = config.initialFrame ?? 0;

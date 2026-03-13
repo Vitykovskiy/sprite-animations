@@ -1,11 +1,16 @@
 import {
+  type ComputedRef,
   computed,
+  inject,
   onBeforeUnmount,
   onMounted,
+  provide,
   reactive,
   ref,
   shallowRef,
   watch,
+  type InjectionKey,
+  type Ref,
 } from "vue";
 
 import {
@@ -24,35 +29,46 @@ import type {
   LoadedSpriteSheetImage,
   SpriteSheet,
 } from "../types.js";
-
-export type AssetMode = "sprite-sheet" | "frame-sequence";
-
-export interface PlaygroundConfig {
-  assetType: AssetMode;
-  frameWidth: number;
-  frameHeight: number;
-  columns: number;
-  rows: number;
-  totalFrames: number | undefined;
-  fps: number | undefined;
-  duration: number | undefined;
-  loop: boolean;
-  position: {
-    x: number;
-    y: number;
-  };
-  scale: number;
-  canvas: {
-    width: number;
-    height: number;
-  };
-}
+import type { PlaygroundConfig } from "./types/runtime";
+import type {
+  AssetMode,
+  PlaygroundCanvasForm,
+  PlaygroundGridForm,
+  PlaygroundTimingForm,
+  PlaygroundTransformForm,
+} from "./components/types";
 
 const renderer = createCanvasSpriteRenderer();
 
-export function usePlaygroundRuntime() {
+export interface PlaygroundRuntime {
+  assetMeta: Ref<string>;
+  assetMode: Ref<AssetMode>;
+  assetPickerLabel: ComputedRef<string>;
+  assetStatus: Ref<string>;
+  bindPreviewCanvasRef: (element: HTMLCanvasElement | null) => void;
+  canvasForm: PlaygroundCanvasForm;
+  copyConfigToClipboard: () => Promise<void>;
+  currentFrame: Ref<string>;
+  gridForm: PlaygroundGridForm;
+  gridSectionDisabled: ComputedRef<boolean>;
+  handleAssetSelection: (files: File[]) => Promise<void>;
+  isFrameSequenceMode: ComputedRef<boolean>;
+  pause: () => void;
+  play: () => void;
+  playbackState: Ref<string>;
+  previewMessage: Ref<string>;
+  saveConfigToFile: () => void;
+  serializedConfig: ComputedRef<string>;
+  stop: () => void;
+  timingForm: PlaygroundTimingForm;
+  transformForm: PlaygroundTransformForm;
+}
+
+const playgroundRuntimeKey: InjectionKey<PlaygroundRuntime> =
+  Symbol("playgroundRuntime");
+
+export function createPlaygroundRuntime(): PlaygroundRuntime {
   const previewCanvasRef = ref<HTMLCanvasElement | null>(null);
-  const assetFileInputRef = ref<HTMLInputElement | null>(null);
 
   const assetMode = ref<AssetMode>("sprite-sheet");
   const assetStatus = ref("No asset loaded");
@@ -61,19 +77,28 @@ export function usePlaygroundRuntime() {
   const currentFrame = ref("0");
   const playbackState = ref("idle");
 
-  const config = reactive({
+  const gridForm = reactive<PlaygroundGridForm>({
     frameWidth: 64,
     frameHeight: 64,
     columns: 4,
     rows: 4,
     totalFrames: "",
+  });
+
+  const timingForm = reactive<PlaygroundTimingForm>({
     fps: "12",
     duration: "",
     loop: true,
+  });
+
+  const transformForm = reactive<PlaygroundTransformForm>({
     positionX: 160,
     positionY: 120,
     scale: 2,
     gridOpacity: 0.4,
+  });
+
+  const canvasForm = reactive<PlaygroundCanvasForm>({
     canvasWidth: 640,
     canvasHeight: 360,
   });
@@ -101,7 +126,6 @@ export function usePlaygroundRuntime() {
   );
 
   onMounted(() => {
-    syncAssetInputAttributes();
     syncCanvasSize();
     updateAssetStatus();
     syncRuntime({ autoplay: false });
@@ -118,12 +142,6 @@ export function usePlaygroundRuntime() {
 
   watch(assetMode, () => {
     resetLoadedAssets();
-
-    if (assetFileInputRef.value) {
-      assetFileInputRef.value.value = "";
-    }
-
-    syncAssetInputAttributes();
     updateAssetStatus();
     previewMessage.value = isFrameSequenceMode.value
       ? "Select a folder."
@@ -133,20 +151,20 @@ export function usePlaygroundRuntime() {
 
   watch(
     () => [
-      config.frameWidth,
-      config.frameHeight,
-      config.columns,
-      config.rows,
-      config.totalFrames,
-      config.fps,
-      config.duration,
-      config.loop,
-      config.positionX,
-      config.positionY,
-      config.scale,
-      config.gridOpacity,
-      config.canvasWidth,
-      config.canvasHeight,
+      gridForm.frameWidth,
+      gridForm.frameHeight,
+      gridForm.columns,
+      gridForm.rows,
+      gridForm.totalFrames,
+      timingForm.fps,
+      timingForm.duration,
+      timingForm.loop,
+      transformForm.positionX,
+      transformForm.positionY,
+      transformForm.scale,
+      transformForm.gridOpacity,
+      canvasForm.canvasWidth,
+      canvasForm.canvasHeight,
     ],
     () => {
       syncCanvasSize();
@@ -159,10 +177,7 @@ export function usePlaygroundRuntime() {
     drawPreviewFrame();
   });
 
-  async function handleAssetSelection(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement | null;
-    const files = Array.from(input?.files ?? []);
-
+  async function handleAssetSelection(files: File[]): Promise<void> {
     if (files.length === 0) {
       resetLoadedAssets();
       updateAssetStatus();
@@ -344,7 +359,11 @@ export function usePlaygroundRuntime() {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillStyle = "#ffffff";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    drawCanvasGrid(context, canvas, readGridOpacity(config.gridOpacity, 0.4));
+    drawCanvasGrid(
+      context,
+      canvas,
+      readGridOpacity(transformForm.gridOpacity, 0.4),
+    );
 
     if (!animationSource.value || !player.value) {
       drawPlaceholder(context, canvas);
@@ -441,47 +460,33 @@ export function usePlaygroundRuntime() {
       return;
     }
 
-    canvas.width = readPositiveInteger(config.canvasWidth, 640);
-    canvas.height = readPositiveInteger(config.canvasHeight, 360);
+    canvas.width = readPositiveInteger(canvasForm.canvasWidth, 640);
+    canvas.height = readPositiveInteger(canvasForm.canvasHeight, 360);
   }
 
-  function syncAssetInputAttributes(): void {
-    const input = assetFileInputRef.value;
-
-    if (!input) {
-      return;
-    }
-
-    input.multiple = isFrameSequenceMode.value;
-
-    if (isFrameSequenceMode.value) {
-      input.setAttribute("webkitdirectory", "");
-      input.setAttribute("directory", "");
-    } else {
-      input.removeAttribute("webkitdirectory");
-      input.removeAttribute("directory");
-    }
+  function bindPreviewCanvasRef(element: HTMLCanvasElement | null): void {
+    previewCanvasRef.value = element;
   }
 
   function readConfig(): PlaygroundConfig {
     return {
       assetType: assetMode.value,
-      frameWidth: readPositiveInteger(config.frameWidth, 64),
-      frameHeight: readPositiveInteger(config.frameHeight, 64),
-      columns: readPositiveInteger(config.columns, 4),
-      rows: readPositiveInteger(config.rows, 4),
-      totalFrames: readOptionalPositiveInteger(config.totalFrames),
-      fps: readOptionalPositiveNumber(config.fps),
-      duration: readOptionalNonNegativeNumber(config.duration),
-      loop: config.loop,
+      frameWidth: readPositiveInteger(gridForm.frameWidth, 64),
+      frameHeight: readPositiveInteger(gridForm.frameHeight, 64),
+      columns: readPositiveInteger(gridForm.columns, 4),
+      rows: readPositiveInteger(gridForm.rows, 4),
+      totalFrames: readOptionalPositiveInteger(gridForm.totalFrames),
+      fps: readOptionalPositiveNumber(timingForm.fps),
+      duration: readOptionalNonNegativeNumber(timingForm.duration),
+      loop: timingForm.loop,
       position: {
-        x: readNumber(config.positionX, 160),
-        y: readNumber(config.positionY, 120),
+        x: readNumber(transformForm.positionX, 160),
+        y: readNumber(transformForm.positionY, 120),
       },
-      scale: readPositiveNumber(config.scale, 2),
+      scale: readPositiveNumber(transformForm.scale, 2),
       canvas: {
-        width: readPositiveInteger(config.canvasWidth, 640),
-        height: readPositiveInteger(config.canvasHeight, 360),
+        width: readPositiveInteger(canvasForm.canvasWidth, 640),
+        height: readPositiveInteger(canvasForm.canvasHeight, 360),
       },
     };
   }
@@ -507,26 +512,42 @@ export function usePlaygroundRuntime() {
   }
 
   return {
-    assetFileInputRef,
     assetMeta,
     assetMode,
     assetPickerLabel,
     assetStatus,
-    config,
+    canvasForm,
     copyConfigToClipboard,
     currentFrame,
+    gridForm,
     gridSectionDisabled,
     handleAssetSelection,
     isFrameSequenceMode,
     pause,
     play,
     playbackState,
-    previewCanvasRef,
+    bindPreviewCanvasRef,
     previewMessage,
     saveConfigToFile,
     serializedConfig,
     stop,
+    timingForm,
+    transformForm,
   };
+}
+
+export function providePlaygroundRuntime(runtime: PlaygroundRuntime): void {
+  provide(playgroundRuntimeKey, runtime);
+}
+
+export function usePlaygroundRuntime(): PlaygroundRuntime {
+  const runtime = inject(playgroundRuntimeKey);
+
+  if (!runtime) {
+    throw new Error("Playground runtime is not provided.");
+  }
+
+  return runtime;
 }
 
 function readNumber(value: number | string, fallback: number): number {
@@ -548,7 +569,9 @@ function readPositiveNumber(value: number | string, fallback: number): number {
     : fallback;
 }
 
-function readOptionalPositiveInteger(value: number | string): number | undefined {
+function readOptionalPositiveInteger(
+  value: number | string,
+): number | undefined {
   if (isBlankValue(value)) {
     return undefined;
   }
@@ -559,7 +582,9 @@ function readOptionalPositiveInteger(value: number | string): number | undefined
     : undefined;
 }
 
-function readOptionalPositiveNumber(value: number | string): number | undefined {
+function readOptionalPositiveNumber(
+  value: number | string,
+): number | undefined {
   if (isBlankValue(value)) {
     return undefined;
   }
@@ -570,7 +595,9 @@ function readOptionalPositiveNumber(value: number | string): number | undefined 
     : undefined;
 }
 
-function readOptionalNonNegativeNumber(value: number | string): number | undefined {
+function readOptionalNonNegativeNumber(
+  value: number | string,
+): number | undefined {
   if (isBlankValue(value)) {
     return undefined;
   }

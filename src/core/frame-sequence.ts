@@ -5,7 +5,9 @@ import type {
   FrameSequenceImage,
 } from "../types.js";
 
-export function createFrameSequence(config: FrameSequenceConfig): FrameSequence {
+export function createFrameSequence(
+  config: FrameSequenceConfig,
+): FrameSequence {
   const frames = normalizeFrames(config.frames);
 
   return {
@@ -19,7 +21,9 @@ export function createFrameSequence(config: FrameSequenceConfig): FrameSequence 
   };
 }
 
-function normalizeFrames(frames: FrameSequenceImage[]): readonly FrameSequenceImage[] {
+function normalizeFrames(
+  frames: FrameSequenceImage[],
+): readonly FrameSequenceImage[] {
   if (!Array.isArray(frames) || frames.length === 0) {
     throw new Error("frames must contain at least one image.");
   }
@@ -36,13 +40,17 @@ function resolveFrame(
   }
 
   if (frameIndex >= frames.length) {
-    throw new Error("frameIndex is outside the configured frame sequence range.");
+    throw new Error(
+      "frameIndex is outside the configured frame sequence range.",
+    );
   }
 
   const image = frames[frameIndex];
 
   if (!image) {
-    throw new Error("frameIndex is outside the configured frame sequence range.");
+    throw new Error(
+      "frameIndex is outside the configured frame sequence range.",
+    );
   }
 
   const dimensions = getImageDimensions(image);
@@ -57,7 +65,10 @@ function resolveFrame(
   };
 }
 
-function getImageDimensions(image: FrameSequenceImage): { width: number; height: number } {
+function getImageDimensions(image: FrameSequenceImage): {
+  width: number;
+  height: number;
+} {
   if ("naturalWidth" in image && "naturalHeight" in image) {
     return {
       width: image.naturalWidth,

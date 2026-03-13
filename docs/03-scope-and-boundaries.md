@@ -39,9 +39,9 @@
 
 ## Deferred Scope (следующие версии)
 
-| Функциональность       | Версия  | Обоснование отсрочки  |
-|------------------------|---------|-----------------------|
-| State switching / animation states | v2 | В MVP нет подтвержденного use case |
-| Framework adapters | v2 | Сначала нужен стабильный framework-agnostic core |
-| WebGL renderer | Backlog | Слишком далеко от целей первой версии |
-| Визуальный editor | Backlog | Дорого в реализации и не нужен для запуска MVP |
+| Функциональность                   | Версия  | Обоснование отсрочки                             |
+| ---------------------------------- | ------- | ------------------------------------------------ |
+| State switching / animation states | v2      | В MVP нет подтвержденного use case               |
+| Framework adapters                 | v2      | Сначала нужен стабильный framework-agnostic core |
+| WebGL renderer                     | Backlog | Слишком далеко от целей первой версии            |
+| Визуальный editor                  | Backlog | Дорого в реализации и не нужен для запуска MVP   |

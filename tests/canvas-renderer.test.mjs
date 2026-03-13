@@ -31,19 +31,7 @@ test("canvas renderer draws the requested frame using position and scale", () =>
     scale: 2,
   });
 
-  assert.deepEqual(calls, [
-    [
-      { tag: "image" },
-      32,
-      16,
-      32,
-      16,
-      10,
-      20,
-      64,
-      32,
-    ],
-  ]);
+  assert.deepEqual(calls, [[{ tag: "image" }, 32, 16, 32, 16, 10, 20, 64, 32]]);
 });
 
 test("canvas renderer draws the requested frame from a frame sequence", () => {
@@ -70,16 +58,6 @@ test("canvas renderer draws the requested frame from a frame sequence", () => {
   });
 
   assert.deepEqual(calls, [
-    [
-      { width: 14, height: 18, tag: "frame-2" },
-      0,
-      0,
-      14,
-      18,
-      5,
-      8,
-      28,
-      36,
-    ],
+    [{ width: 14, height: 18, tag: "frame-2" }, 0, 0, 14, 18, 5, 8, 28, 36],
   ]);
 });

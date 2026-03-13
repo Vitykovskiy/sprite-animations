@@ -1,9 +1,4 @@
-import type {
-  DrawableFrame,
-  FrameRect,
-  SpriteSheet,
-  SpriteSheetConfig,
-} from "../types.js";
+import type { FrameRect, SpriteSheet, SpriteSheetConfig } from "../types.js";
 
 export function createSpriteSheet(config: SpriteSheetConfig): SpriteSheet {
   const normalizedGrid = normalizeGrid(config);
@@ -28,7 +23,9 @@ export function createSpriteSheet(config: SpriteSheetConfig): SpriteSheet {
   };
 }
 
-function normalizeGrid(config: SpriteSheetConfig): Required<SpriteSheetConfig["grid"]> {
+function normalizeGrid(
+  config: SpriteSheetConfig,
+): Required<SpriteSheetConfig["grid"]> {
   const { frameWidth, frameHeight, columns, rows } = config.grid;
 
   if (frameWidth <= 0 || frameHeight <= 0) {
@@ -50,7 +47,9 @@ function normalizeGrid(config: SpriteSheetConfig): Required<SpriteSheetConfig["g
   }
 
   if (totalFrames > columns * rows) {
-    throw new Error("totalFrames cannot exceed the capacity of the sprite sheet grid.");
+    throw new Error(
+      "totalFrames cannot exceed the capacity of the sprite sheet grid.",
+    );
   }
 
   return {
