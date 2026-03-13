@@ -8,6 +8,11 @@ Framework-agnostic TypeScript library for 2D sprite animation on HTML canvas.
 npm install @vitykovskiy/canvas-sprite-animations
 ```
 
+## Links
+
+- GitHub: https://github.com/Vitykovskiy/sprite-animations
+- Playground: https://vitykovskiy.github.io/sprite-animations/
+
 ## Usage
 
 ```ts
