@@ -148,8 +148,7 @@ async function handleAssetSelection(): Promise<void> {
 
   try {
     loadedImage = await loadSpriteSheetImage(activeObjectUrl);
-    elements.previewMessage.textContent =
-      "Preview ready. Adjust the controls on the left to refine the runtime.";
+    elements.previewMessage.textContent = "Image loaded.";
     updateAssetStatus(file.name);
     syncRuntime({ autoplay: true });
   } catch (error) {
@@ -157,8 +156,8 @@ async function handleAssetSelection(): Promise<void> {
     spriteSheet = null;
     player = null;
     const message =
-      error instanceof Error ? error.message : "Failed to load the selected file.";
-    elements.assetStatus.textContent = "Asset load failed";
+      error instanceof Error ? error.message : "Failed to load file.";
+    elements.assetStatus.textContent = "Load failed";
     elements.assetMeta.textContent = message;
     elements.previewMessage.textContent = message;
     drawPreviewFrame();
@@ -206,7 +205,7 @@ function syncRuntime(options: { autoplay: boolean }): void {
     drawPreviewFrame();
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : "Invalid runtime configuration.";
+      error instanceof Error ? error.message : "Invalid configuration.";
     elements.previewMessage.textContent = message;
   }
 }
@@ -278,7 +277,7 @@ function drawPlaceholder(): void {
   context.textAlign = "center";
   context.font = '500 16px "Aptos", "Segoe UI", sans-serif';
   context.fillText(
-    "Load a sprite sheet to preview the animation runtime.",
+    "Select an image.",
     elements.previewCanvas.width / 2,
     elements.previewCanvas.height / 2,
   );
@@ -288,11 +287,11 @@ function drawPlaceholder(): void {
 function updateAssetStatus(fileName?: string): void {
   if (!loadedImage) {
     elements.assetStatus.textContent = "No asset loaded";
-    elements.assetMeta.textContent = "Choose a local sprite sheet image to begin.";
+    elements.assetMeta.textContent = "Select a local image.";
     return;
   }
 
-  elements.assetStatus.textContent = fileName ?? "Sprite sheet loaded";
+  elements.assetStatus.textContent = fileName ?? "Image loaded";
   elements.assetMeta.textContent = `${loadedImage.width} x ${loadedImage.height} px`;
 }
 
@@ -341,9 +340,9 @@ async function copyConfigToClipboard(): Promise<void> {
 
   try {
     await navigator.clipboard.writeText(json);
-    elements.previewMessage.textContent = "JSON config copied to clipboard.";
+    elements.previewMessage.textContent = "JSON copied.";
   } catch {
-    elements.previewMessage.textContent = "Clipboard write failed. Copy the JSON manually.";
+    elements.previewMessage.textContent = "Copy failed.";
   }
 }
 
@@ -359,7 +358,7 @@ function saveConfigToFile(): void {
   anchor.click();
   URL.revokeObjectURL(url);
 
-  elements.previewMessage.textContent = "JSON config saved.";
+  elements.previewMessage.textContent = "JSON saved.";
 }
 
 function readNumber(element: HTMLInputElement, fallback: number): number {
