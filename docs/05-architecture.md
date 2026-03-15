@@ -14,13 +14,13 @@
 
 ## Компоненты
 
-| Компонент        | Зона ответственности                                          | Технология                         |
-| ---------------- | ------------------------------------------------------------- | ---------------------------------- |
-| Asset Loader     | Загрузка sprite sheet и отдельных кадров                      | Browser image loading / TypeScript |
-| Sprite Model     | Описание сетки кадров, frame sequence и конфигурации анимации | TypeScript                         |
-| Animation Player | Вычисление текущего кадра, тайминга, loop и frame skipping    | TypeScript                         |
-| Canvas Renderer  | Отрисовка текущего кадра на `canvas`, масштаб и позиция       | Canvas 2D API                      |
-| Playground       | Настройка параметров, предпросмотр и сохранение конфига       | Vue 3 + Vite + TypeScript          |
+| Компонент        | Зона ответственности                                                        | Технология                         |
+| ---------------- | --------------------------------------------------------------------------- | ---------------------------------- |
+| Asset Loader     | Загрузка sprite sheet и отдельных кадров                                    | Browser image loading / TypeScript |
+| Sprite Model     | Описание сетки кадров, frame sequence и конфигурации анимации               | TypeScript                         |
+| Animation Player | Вычисление текущего кадра, тайминга, loop и frame skipping                  | TypeScript                         |
+| Canvas Renderer  | Отрисовка текущего кадра на `canvas`, масштаб и позиция                     | Canvas 2D API                      |
+| Playground       | Настройка параметров, background preview, предпросмотр и сохранение конфига | Vue 3 + Vite + TypeScript          |
 
 ---
 
@@ -42,9 +42,11 @@
 [Sprite Model] --> [Animation Player] --> [Canvas Renderer]
 [Sprite Model] --> [Vue Playground UI]
 [Animation Player] --> [Playground Preview]
+[Background Palette / Local Background Image] --> [Vue Playground UI] --> [Playground Preview]
 ```
 
 Разработчик или playground передает в core либо sprite sheet с конфигом сетки, либо набор отдельных кадров. `Animation Player` вычисляет текущий кадр на основе времени, `fps`, `duration` и режима loop. Vue-слой playground хранит UI-состояние и делегирует canvas/runtime orchestration в composable. `Canvas Renderer` получает вычисленный кадр и рисует его в заданной позиции и масштабе независимо от формата ассета.
+Background preview хранится как локальное UI-состояние playground, используется только при отрисовке preview canvas и не входит в экспортируемый JSON-конфиг анимации.
 
 ---
 

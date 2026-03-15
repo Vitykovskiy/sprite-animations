@@ -1,4 +1,12 @@
 export type AssetMode = "sprite-sheet" | "frame-sequence";
+export type BackgroundMode = "palette" | "image";
+export type BackgroundPaletteId =
+  | "paper-white"
+  | "ink-black"
+  | "chroma-green"
+  | "neutral-gray"
+  | "sand";
+export type BackgroundImageFit = "cover" | "contain" | "repeat" | "stretch";
 
 export interface PlaygroundGridForm {
   frameWidth: number;
@@ -24,4 +32,10 @@ export interface PlaygroundTransformForm {
 export interface PlaygroundCanvasForm {
   canvasWidth: number;
   canvasHeight: number;
+}
+
+export interface PlaygroundBackgroundForm {
+  mode: BackgroundMode;
+  palette: BackgroundPaletteId;
+  imageFit: BackgroundImageFit;
 }

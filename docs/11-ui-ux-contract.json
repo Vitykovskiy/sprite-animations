@@ -1,8 +1,8 @@
 {
   "document": {
     "name": "playground-ui-ux-contract",
-    "version": "1.2.0",
-    "last_updated": "2026-03-13",
+    "version": "1.3.0",
+    "last_updated": "2026-03-15",
     "scope": "sprite-animations dev playground",
     "source_of_truth": [
       "src/playground/App.vue",
@@ -21,6 +21,7 @@
     "audience": ["developer", "designer"],
     "primary_jobs": [
       "load a local sprite sheet or frame folder",
+      "check sprite quality on different backgrounds",
       "configure grid and timing",
       "preview animation on canvas",
       "save or copy JSON configuration"
@@ -39,6 +40,7 @@
           "timing",
           "transform",
           "canvas",
+          "background",
           "playback",
           "config"
         ]
@@ -250,6 +252,57 @@
       ]
     },
     {
+      "id": "background",
+      "title": "Background",
+      "purpose": "control dev-only preview background without changing animation config",
+      "elements": [
+        {
+          "id": "background-source",
+          "type": "select",
+          "label": "Source",
+          "default": "palette",
+          "options": ["palette", "image"],
+          "behavior": "switches preview background source between preset color palette and local image"
+        },
+        {
+          "id": "background-palette",
+          "type": "select",
+          "label": "Palette",
+          "default": "paper-white",
+          "options": [
+            "paper-white",
+            "ink-black",
+            "chroma-green",
+            "neutral-gray",
+            "sand"
+          ],
+          "behavior": "selects the fallback or active preview palette"
+        },
+        {
+          "id": "background-image-fit",
+          "type": "select",
+          "label": "Image mode",
+          "default": "cover",
+          "options": ["cover", "contain", "repeat", "stretch"],
+          "behavior": "controls how the local background image is rendered on the preview canvas"
+        },
+        {
+          "id": "background-image",
+          "type": "file-input",
+          "label": "Background image",
+          "required": false,
+          "accept": "image/*",
+          "behavior": "loads a local image for preview-only background rendering"
+        },
+        {
+          "id": "background-status",
+          "type": "status-heading",
+          "label": "Background status",
+          "behavior": "shows the active palette or loaded image state"
+        }
+      ]
+    },
+    {
       "id": "playback",
       "title": "Playback",
       "purpose": "control animation state and inspect runtime status",
@@ -335,6 +388,7 @@
     "Changing grid, timing, transform, or canvas inputs immediately recalculates the runtime config through Vue reactive state.",
     "Selecting sprite-sheet mode loads a single image and starts playback.",
     "Selecting frame-sequence mode loads a folder of frame images sorted by relative path or file name and starts playback.",
+    "Background palette and image settings affect only preview rendering and never change the exported JSON config.",
     "Grid controls are disabled while frame-sequence mode is active.",
     "Pause preserves the current frame state; stop resets to the initial frame.",
     "JSON output always mirrors the current UI state.",

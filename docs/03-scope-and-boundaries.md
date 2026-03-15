@@ -14,6 +14,7 @@
 - Тайминг через `fps` и/или `duration`
 - Dev playground на Vue 3 для настройки и проверки параметров
 - Сохранение конфигурации анимации в JSON
+- Dev-only background preview в playground: palette presets и локальная background-картинка
 
 ---
 
@@ -25,6 +26,7 @@
 - Framework adapters для public runtime (`React`, `Vue` и др.)
 - WebGL renderer в первой версии
 - Physics, collisions, audio sync
+- Сохранение background preview в JSON-конфиг
 
 ---
 
@@ -34,6 +36,7 @@
 - Только `canvas 2d`
 - Основные форматы ассетов — regular grid sprite sheet и frame sequence
 - Playground ориентирован на разработку и тестирование, а не на конечных пользователей
+- Настройки background preview действуют только в текущей сессии playground
 
 ---
 

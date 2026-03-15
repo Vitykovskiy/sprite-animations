@@ -6,12 +6,17 @@ const {
   assetMode,
   assetPickerLabel,
   assetStatus,
+  backgroundForm,
+  backgroundImageFitDisabled,
+  backgroundMode,
+  backgroundStatus,
   canvasForm,
   copyConfigToClipboard,
   currentFrame,
   gridForm,
   gridSectionDisabled,
   handleAssetSelection,
+  handleBackgroundImageSelection,
   isFrameSequenceMode,
   pause,
   play,
@@ -36,6 +41,21 @@ function handleAssetModeChange(event: Event): void {
 function handleAssetInputChange(event: Event): void {
   const input = event.target as HTMLInputElement | null;
   void handleAssetSelection(Array.from(input?.files ?? []));
+}
+
+function handleBackgroundModeChange(event: Event): void {
+  const select = event.target as HTMLSelectElement | null;
+
+  if (!select) {
+    return;
+  }
+
+  backgroundForm.mode = select.value as typeof backgroundForm.mode;
+}
+
+function handleBackgroundImageInputChange(event: Event): void {
+  const input = event.target as HTMLInputElement | null;
+  void handleBackgroundImageSelection(Array.from(input?.files ?? []));
 }
 </script>
 
@@ -198,6 +218,55 @@ function handleAssetInputChange(event: Event): void {
           min="64"
         />
       </label>
+    </section>
+
+    <section class="panel-section grid-two">
+      <h2>Background</h2>
+      <label class="field field-full">
+        <span>Source</span>
+        <select :value="backgroundMode" @change="handleBackgroundModeChange">
+          <option value="palette">Palette</option>
+          <option value="image">Image</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Palette</span>
+        <select v-model="backgroundForm.palette">
+          <option value="paper-white">Paper White</option>
+          <option value="ink-black">Ink Black</option>
+          <option value="chroma-green">Chroma Green</option>
+          <option value="neutral-gray">Neutral Gray</option>
+          <option value="sand">Sand</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Image mode</span>
+        <select
+          v-model="backgroundForm.imageFit"
+          :disabled="backgroundImageFitDisabled"
+        >
+          <option value="cover">Cover</option>
+          <option value="contain">Contain</option>
+          <option value="repeat">Repeat</option>
+          <option value="stretch">Stretch</option>
+        </select>
+      </label>
+      <label class="field field-full">
+        <span>Background image</span>
+        <div class="upload-field">
+          <span class="upload-icon" aria-hidden="true"></span>
+          <span>Select image</span>
+          <input
+            type="file"
+            accept="image/*"
+            @change="handleBackgroundImageInputChange"
+          />
+        </div>
+      </label>
+      <div class="status-inline field-full">
+        <span class="status-label">Background</span>
+        <strong>{{ backgroundStatus }}</strong>
+      </div>
     </section>
 
     <section class="panel-section">

@@ -32,6 +32,10 @@ import type {
 import type { PlaygroundConfig } from "./types/runtime";
 import type {
   AssetMode,
+  BackgroundImageFit,
+  BackgroundPaletteId,
+  BackgroundMode,
+  PlaygroundBackgroundForm,
   PlaygroundCanvasForm,
   PlaygroundGridForm,
   PlaygroundTimingForm,
@@ -40,11 +44,23 @@ import type {
 
 const renderer = createCanvasSpriteRenderer();
 
+const BACKGROUND_PALETTES: Record<BackgroundPaletteId, string> = {
+  "paper-white": "#ffffff",
+  "ink-black": "#050505",
+  "chroma-green": "#00ff66",
+  "neutral-gray": "#9ca3af",
+  sand: "#d9c29c",
+};
+
 export interface PlaygroundRuntime {
   assetMeta: Ref<string>;
   assetMode: Ref<AssetMode>;
   assetPickerLabel: ComputedRef<string>;
   assetStatus: Ref<string>;
+  backgroundForm: PlaygroundBackgroundForm;
+  backgroundImageFitDisabled: ComputedRef<boolean>;
+  backgroundMode: ComputedRef<BackgroundMode>;
+  backgroundStatus: Ref<string>;
   bindPreviewCanvasRef: (element: HTMLCanvasElement | null) => void;
   canvasForm: PlaygroundCanvasForm;
   copyConfigToClipboard: () => Promise<void>;
@@ -52,6 +68,7 @@ export interface PlaygroundRuntime {
   gridForm: PlaygroundGridForm;
   gridSectionDisabled: ComputedRef<boolean>;
   handleAssetSelection: (files: File[]) => Promise<void>;
+  handleBackgroundImageSelection: (files: File[]) => Promise<void>;
   isFrameSequenceMode: ComputedRef<boolean>;
   pause: () => void;
   play: () => void;
@@ -76,6 +93,7 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
   const previewMessage = ref("Select an image.");
   const currentFrame = ref("0");
   const playbackState = ref("idle");
+  const backgroundStatus = ref("Palette: Paper White");
 
   const gridForm = reactive<PlaygroundGridForm>({
     frameWidth: 64,
@@ -103,8 +121,16 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     canvasHeight: 360,
   });
 
+  const backgroundForm = reactive<PlaygroundBackgroundForm>({
+    mode: "palette",
+    palette: "paper-white",
+    imageFit: "cover",
+  });
+
   const loadedImage = shallowRef<LoadedSpriteSheetImage | null>(null);
   const loadedFrames = shallowRef<LoadedFrameImage[]>([]);
+  const backgroundImage = shallowRef<HTMLImageElement | null>(null);
+  const backgroundImageName = ref<string | null>(null);
   const spriteSheet = shallowRef<SpriteSheet | null>(null);
   const frameSequence = shallowRef<FrameSequence | null>(null);
   const animationSource = shallowRef<AnimationFrameSource | null>(null);
@@ -112,6 +138,7 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
 
   let previousTimestamp = 0;
   let activeObjectUrls: string[] = [];
+  let activeBackgroundObjectUrl: string | null = null;
   let animationFrameId = 0;
 
   const isFrameSequenceMode = computed(
@@ -121,6 +148,10 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     isFrameSequenceMode.value ? "Select folder" : "Select image",
   );
   const gridSectionDisabled = computed(() => isFrameSequenceMode.value);
+  const backgroundMode = computed(() => backgroundForm.mode);
+  const backgroundImageFitDisabled = computed(
+    () => backgroundForm.mode !== "image" || backgroundImage.value === null,
+  );
   const serializedConfig = computed(() =>
     JSON.stringify(readConfig(), null, 2),
   );
@@ -128,12 +159,14 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
   onMounted(() => {
     syncCanvasSize();
     updateAssetStatus();
+    updateBackgroundStatus();
     syncRuntime({ autoplay: false });
     animationFrameId = window.requestAnimationFrame(tick);
   });
 
   onBeforeUnmount(() => {
     releaseActiveObjectUrls();
+    releaseBackgroundObjectUrl();
 
     if (animationFrameId !== 0) {
       window.cancelAnimationFrame(animationFrameId);
@@ -169,6 +202,18 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     () => {
       syncCanvasSize();
       syncRuntime({ autoplay: false });
+    },
+  );
+
+  watch(
+    () => [
+      backgroundForm.mode,
+      backgroundForm.palette,
+      backgroundForm.imageFit,
+    ],
+    () => {
+      updateBackgroundStatus();
+      drawPreviewFrame();
     },
   );
 
@@ -217,6 +262,45 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
         error instanceof Error ? error.message : "Failed to load file.";
       assetStatus.value = "Load failed";
       assetMeta.value = message;
+      previewMessage.value = message;
+      drawPreviewFrame();
+    }
+  }
+
+  async function handleBackgroundImageSelection(files: File[]): Promise<void> {
+    const [file] = files;
+
+    if (!file) {
+      releaseBackgroundObjectUrl();
+      backgroundImage.value = null;
+      backgroundImageName.value = null;
+      if (backgroundForm.mode === "image") {
+        backgroundForm.mode = "palette";
+      }
+      updateBackgroundStatus();
+      drawPreviewFrame();
+      return;
+    }
+
+    releaseBackgroundObjectUrl();
+
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      activeBackgroundObjectUrl = objectUrl;
+      backgroundImage.value = await loadHtmlImage(objectUrl);
+      backgroundImageName.value = file.name;
+      backgroundForm.mode = "image";
+      previewMessage.value = "Background image loaded.";
+      updateBackgroundStatus();
+      drawPreviewFrame();
+    } catch (error) {
+      backgroundImage.value = null;
+      backgroundImageName.value = null;
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to load background image.";
+      backgroundStatus.value = "Background load failed";
       previewMessage.value = message;
       drawPreviewFrame();
     }
@@ -357,8 +441,7 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     }
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    drawPreviewBackground(context, canvas);
     drawCanvasGrid(
       context,
       canvas,
@@ -378,6 +461,72 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
       position: runtimeConfig.position,
       scale: runtimeConfig.scale,
     });
+  }
+
+  function drawPreviewBackground(
+    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+  ): void {
+    if (backgroundForm.mode === "image" && backgroundImage.value) {
+      drawBackgroundImage(context, canvas, backgroundImage.value);
+      return;
+    }
+
+    context.fillStyle = BACKGROUND_PALETTES[backgroundForm.palette];
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function drawBackgroundImage(
+    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    image: HTMLImageElement,
+  ): void {
+    const fitMode = backgroundForm.imageFit;
+    const sourceWidth = image.naturalWidth || image.width;
+    const sourceHeight = image.naturalHeight || image.height;
+
+    if (fitMode === "repeat") {
+      const pattern = context.createPattern(image, "repeat");
+
+      if (!pattern) {
+        drawPaletteFallback(context, canvas);
+        return;
+      }
+
+      context.save();
+      context.fillStyle = pattern;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.restore();
+      return;
+    }
+
+    if (fitMode === "stretch") {
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    const scale = readImageScale(
+      fitMode,
+      canvas.width,
+      canvas.height,
+      sourceWidth,
+      sourceHeight,
+    );
+    const drawWidth = sourceWidth * scale;
+    const drawHeight = sourceHeight * scale;
+    const offsetX = (canvas.width - drawWidth) / 2;
+    const offsetY = (canvas.height - drawHeight) / 2;
+
+    drawPaletteFallback(context, canvas);
+    context.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+  }
+
+  function drawPaletteFallback(
+    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+  ): void {
+    context.fillStyle = BACKGROUND_PALETTES[backgroundForm.palette];
+    context.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   function drawCanvasGrid(
@@ -447,6 +596,19 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
       : "Select a local image.";
   }
 
+  function updateBackgroundStatus(): void {
+    if (backgroundForm.mode === "image") {
+      backgroundStatus.value = backgroundImage.value
+        ? backgroundImageName.value
+          ? `Image: ${backgroundImageName.value}`
+          : "Image background active"
+        : "No background image";
+      return;
+    }
+
+    backgroundStatus.value = `Palette: ${formatBackgroundPaletteLabel(backgroundForm.palette)}`;
+  }
+
   function updatePlaybackMetrics(): void {
     const snapshot = player.value?.getSnapshot();
     currentFrame.value = String(snapshot?.frameIndex ?? 0);
@@ -507,6 +669,15 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     activeObjectUrls = [];
   }
 
+  function releaseBackgroundObjectUrl(): void {
+    if (!activeBackgroundObjectUrl) {
+      return;
+    }
+
+    URL.revokeObjectURL(activeBackgroundObjectUrl);
+    activeBackgroundObjectUrl = null;
+  }
+
   function hasLoadedAsset(): boolean {
     return loadedImage.value !== null || loadedFrames.value.length > 0;
   }
@@ -516,12 +687,17 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     assetMode,
     assetPickerLabel,
     assetStatus,
+    backgroundForm,
+    backgroundImageFitDisabled,
+    backgroundMode,
+    backgroundStatus,
     canvasForm,
     copyConfigToClipboard,
     currentFrame,
     gridForm,
     gridSectionDisabled,
     handleAssetSelection,
+    handleBackgroundImageSelection,
     isFrameSequenceMode,
     pause,
     play,
@@ -629,5 +805,36 @@ function compareFrameFiles(left: File, right: File): number {
   return leftPath.localeCompare(rightPath, undefined, {
     numeric: true,
     sensitivity: "base",
+  });
+}
+
+function formatBackgroundPaletteLabel(value: BackgroundPaletteId): string {
+  return value
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function readImageScale(
+  fitMode: Exclude<BackgroundImageFit, "repeat" | "stretch">,
+  targetWidth: number,
+  targetHeight: number,
+  sourceWidth: number,
+  sourceHeight: number,
+): number {
+  const widthRatio = targetWidth / sourceWidth;
+  const heightRatio = targetHeight / sourceHeight;
+
+  return fitMode === "cover"
+    ? Math.max(widthRatio, heightRatio)
+    : Math.min(widthRatio, heightRatio);
+}
+
+function loadHtmlImage(source: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Failed to load image."));
+    image.src = source;
   });
 }
