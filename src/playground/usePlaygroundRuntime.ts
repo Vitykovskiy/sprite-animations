@@ -63,12 +63,12 @@ export interface PlaygroundRuntime {
   backgroundStatus: Ref<string>;
   bindPreviewCanvasRef: (element: HTMLCanvasElement | null) => void;
   canvasForm: PlaygroundCanvasForm;
-  copyConfigToClipboard: () => Promise<void>;
   currentFrame: Ref<string>;
   gridForm: PlaygroundGridForm;
   gridSectionDisabled: ComputedRef<boolean>;
   handleAssetSelection: (files: File[]) => Promise<void>;
   handleBackgroundImageSelection: (files: File[]) => Promise<void>;
+  loadConfigFromFile: (files: File[]) => Promise<void>;
   isFrameSequenceMode: ComputedRef<boolean>;
   pause: () => void;
   play: () => void;
@@ -321,15 +321,6 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     drawPreviewFrame();
   }
 
-  async function copyConfigToClipboard(): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(serializedConfig.value);
-      previewMessage.value = "JSON copied.";
-    } catch {
-      previewMessage.value = "Copy failed.";
-    }
-  }
-
   function saveConfigToFile(): void {
     const blob = new Blob([serializedConfig.value], {
       type: "application/json",
@@ -341,6 +332,24 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     anchor.click();
     URL.revokeObjectURL(url);
     previewMessage.value = "JSON saved.";
+  }
+
+  async function loadConfigFromFile(files: File[]): Promise<void> {
+    const [file] = files;
+
+    if (!file) {
+      previewMessage.value = "No JSON selected.";
+      return;
+    }
+
+    try {
+      const config = parsePlaygroundConfig(await file.text());
+      applyLoadedConfig(config);
+      previewMessage.value = "JSON loaded.";
+    } catch (error) {
+      previewMessage.value =
+        error instanceof Error ? error.message : "Failed to load JSON.";
+    }
   }
 
   function syncRuntime(options: { autoplay: boolean }): void {
@@ -630,6 +639,25 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     previewCanvasRef.value = element;
   }
 
+  function applyLoadedConfig(config: PlaygroundConfig): void {
+    assetMode.value = config.assetType;
+    gridForm.frameWidth = config.frameWidth;
+    gridForm.frameHeight = config.frameHeight;
+    gridForm.columns = config.columns;
+    gridForm.rows = config.rows;
+    gridForm.totalFrames =
+      config.totalFrames === undefined ? "" : String(config.totalFrames);
+    timingForm.fps = config.fps === undefined ? "" : String(config.fps);
+    timingForm.duration =
+      config.duration === undefined ? "" : String(config.duration);
+    timingForm.loop = config.loop;
+    transformForm.positionX = config.position.x;
+    transformForm.positionY = config.position.y;
+    transformForm.scale = config.scale;
+    canvasForm.canvasWidth = config.canvas.width;
+    canvasForm.canvasHeight = config.canvas.height;
+  }
+
   function readConfig(): PlaygroundConfig {
     return {
       assetType: assetMode.value,
@@ -692,12 +720,12 @@ export function createPlaygroundRuntime(): PlaygroundRuntime {
     backgroundMode,
     backgroundStatus,
     canvasForm,
-    copyConfigToClipboard,
     currentFrame,
     gridForm,
     gridSectionDisabled,
     handleAssetSelection,
     handleBackgroundImageSelection,
+    loadConfigFromFile,
     isFrameSequenceMode,
     pause,
     play,
@@ -837,4 +865,151 @@ function loadHtmlImage(source: string): Promise<HTMLImageElement> {
     image.onerror = () => reject(new Error("Failed to load image."));
     image.src = source;
   });
+}
+
+function parsePlaygroundConfig(source: string): PlaygroundConfig {
+  let parsedValue: unknown;
+
+  try {
+    parsedValue = JSON.parse(source);
+  } catch {
+    throw new Error("Invalid JSON file.");
+  }
+
+  if (!isRecord(parsedValue)) {
+    throw new Error("JSON config must be an object.");
+  }
+
+  const position = parsedValue.position;
+  const canvas = parsedValue.canvas;
+
+  if (!isRecord(position) || !isRecord(canvas)) {
+    throw new Error("JSON config is missing position or canvas.");
+  }
+
+  return {
+    assetType: readAssetMode(parsedValue.assetType),
+    frameWidth: readRequiredPositiveInteger(
+      parsedValue.frameWidth,
+      "frameWidth",
+    ),
+    frameHeight: readRequiredPositiveInteger(
+      parsedValue.frameHeight,
+      "frameHeight",
+    ),
+    columns: readRequiredPositiveInteger(parsedValue.columns, "columns"),
+    rows: readRequiredPositiveInteger(parsedValue.rows, "rows"),
+    totalFrames: readOptionalPositiveIntegerFromUnknown(
+      parsedValue.totalFrames,
+    ),
+    fps: readOptionalPositiveNumberFromUnknown(parsedValue.fps),
+    duration: readOptionalNonNegativeNumberFromUnknown(parsedValue.duration),
+    loop: readBoolean(parsedValue.loop, "loop"),
+    position: {
+      x: readRequiredNumber(position.x, "position.x"),
+      y: readRequiredNumber(position.y, "position.y"),
+    },
+    scale: readRequiredPositiveNumber(parsedValue.scale, "scale"),
+    canvas: {
+      width: readRequiredPositiveInteger(canvas.width, "canvas.width"),
+      height: readRequiredPositiveInteger(canvas.height, "canvas.height"),
+    },
+  };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function readAssetMode(value: unknown): AssetMode {
+  if (value === "sprite-sheet" || value === "frame-sequence") {
+    return value;
+  }
+
+  throw new Error("JSON config contains unsupported assetType.");
+}
+
+function readRequiredNumber(value: unknown, fieldName: string): number {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  throw new Error(`JSON config field "${fieldName}" must be a number.`);
+}
+
+function readRequiredPositiveNumber(value: unknown, fieldName: string): number {
+  const normalizedValue = readRequiredNumber(value, fieldName);
+
+  if (normalizedValue > 0) {
+    return normalizedValue;
+  }
+
+  throw new Error(`JSON config field "${fieldName}" must be greater than 0.`);
+}
+
+function readRequiredPositiveInteger(
+  value: unknown,
+  fieldName: string,
+): number {
+  const normalizedValue = readRequiredNumber(value, fieldName);
+
+  if (Number.isInteger(normalizedValue) && normalizedValue > 0) {
+    return normalizedValue;
+  }
+
+  throw new Error(
+    `JSON config field "${fieldName}" must be a positive integer.`,
+  );
+}
+
+function readBoolean(value: unknown, fieldName: string): boolean {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  throw new Error(`JSON config field "${fieldName}" must be a boolean.`);
+}
+
+function readOptionalPositiveIntegerFromUnknown(
+  value: unknown,
+): number | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value === "number" && Number.isInteger(value) && value > 0) {
+    return value;
+  }
+
+  throw new Error(
+    'JSON config field "totalFrames" must be a positive integer.',
+  );
+}
+
+function readOptionalPositiveNumberFromUnknown(
+  value: unknown,
+): number | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value) && value > 0) {
+    return value;
+  }
+
+  throw new Error('JSON config field "fps" must be greater than 0.');
+}
+
+function readOptionalNonNegativeNumberFromUnknown(
+  value: unknown,
+): number | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+    return value;
+  }
+
+  throw new Error('JSON config field "duration" must be 0 or greater.');
 }

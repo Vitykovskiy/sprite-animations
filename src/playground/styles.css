@@ -297,6 +297,38 @@ button:hover {
   border-color: var(--line-strong);
 }
 
+.button-upload {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--input);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.button-upload:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: var(--line-strong);
+}
+
+.button-upload input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
 .button-primary {
   background: var(--accent);
   border-color: rgba(196, 135, 31, 0.24);

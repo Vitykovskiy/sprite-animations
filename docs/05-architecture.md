@@ -14,13 +14,13 @@
 
 ## Компоненты
 
-| Компонент        | Зона ответственности                                                        | Технология                         |
-| ---------------- | --------------------------------------------------------------------------- | ---------------------------------- |
-| Asset Loader     | Загрузка sprite sheet и отдельных кадров                                    | Browser image loading / TypeScript |
-| Sprite Model     | Описание сетки кадров, frame sequence и конфигурации анимации               | TypeScript                         |
-| Animation Player | Вычисление текущего кадра, тайминга, loop и frame skipping                  | TypeScript                         |
-| Canvas Renderer  | Отрисовка текущего кадра на `canvas`, масштаб и позиция                     | Canvas 2D API                      |
-| Playground       | Настройка параметров, background preview, предпросмотр и сохранение конфига | Vue 3 + Vite + TypeScript          |
+| Компонент        | Зона ответственности                                                                  | Технология                         |
+| ---------------- | ------------------------------------------------------------------------------------- | ---------------------------------- |
+| Asset Loader     | Загрузка sprite sheet и отдельных кадров                                              | Browser image loading / TypeScript |
+| Sprite Model     | Описание сетки кадров, frame sequence и конфигурации анимации                         | TypeScript                         |
+| Animation Player | Вычисление текущего кадра, тайминга, loop и frame skipping                            | TypeScript                         |
+| Canvas Renderer  | Отрисовка текущего кадра на `canvas`, масштаб и позиция                               | Canvas 2D API                      |
+| Playground       | Настройка параметров, background preview, предпросмотр, сохранение и загрузка конфига | Vue 3 + Vite + TypeScript          |
 
 ---
 

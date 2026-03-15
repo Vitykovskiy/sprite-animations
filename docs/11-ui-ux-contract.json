@@ -24,7 +24,7 @@
       "check sprite quality on different backgrounds",
       "configure grid and timing",
       "preview animation on canvas",
-      "save or copy JSON configuration"
+      "save and load JSON configuration"
     ]
   },
   "layout": {
@@ -351,10 +351,11 @@
           "action": "downloads a json file"
         },
         {
-          "id": "copy-config",
-          "type": "button",
-          "label": "Copy JSON",
-          "action": "copies json to clipboard"
+          "id": "load-config",
+          "type": "file-input",
+          "label": "Load JSON",
+          "accept": "application/json,.json",
+          "action": "reads a local json file and applies it to the playground form state"
         },
         {
           "id": "config-output",
@@ -389,10 +390,11 @@
     "Selecting sprite-sheet mode loads a single image and starts playback.",
     "Selecting frame-sequence mode loads a folder of frame images sorted by relative path or file name and starts playback.",
     "Background palette and image settings affect only preview rendering and never change the exported JSON config.",
+    "Load JSON updates only canonical config fields and does not modify background preview state.",
     "Grid controls are disabled while frame-sequence mode is active.",
     "Pause preserves the current frame state; stop resets to the initial frame.",
     "JSON output always mirrors the current UI state.",
-    "Save JSON downloads the current config; Copy JSON writes it to clipboard when permitted."
+    "Save JSON downloads the current config; Load JSON imports a previously saved config file."
   ],
   "implementation_notes": [
     "The playground UI is implemented in Vue 3 using Composition API.",

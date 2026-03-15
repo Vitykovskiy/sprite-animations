@@ -11,13 +11,13 @@ const {
   backgroundMode,
   backgroundStatus,
   canvasForm,
-  copyConfigToClipboard,
   currentFrame,
   gridForm,
   gridSectionDisabled,
   handleAssetSelection,
   handleBackgroundImageSelection,
   isFrameSequenceMode,
+  loadConfigFromFile,
   pause,
   play,
   playbackState,
@@ -56,6 +56,11 @@ function handleBackgroundModeChange(event: Event): void {
 function handleBackgroundImageInputChange(event: Event): void {
   const input = event.target as HTMLInputElement | null;
   void handleBackgroundImageSelection(Array.from(input?.files ?? []));
+}
+
+function handleConfigInputChange(event: Event): void {
+  const input = event.target as HTMLInputElement | null;
+  void loadConfigFromFile(Array.from(input?.files ?? []));
 }
 </script>
 
@@ -292,7 +297,14 @@ function handleBackgroundImageInputChange(event: Event): void {
       <h2>Config</h2>
       <div class="button-row">
         <button type="button" @click="saveConfigToFile">Save JSON</button>
-        <button type="button" @click="copyConfigToClipboard">Copy JSON</button>
+        <label class="button-upload">
+          <span>Load JSON</span>
+          <input
+            type="file"
+            accept="application/json,.json"
+            @change="handleConfigInputChange"
+          />
+        </label>
       </div>
       <textarea
         :value="serializedConfig"
